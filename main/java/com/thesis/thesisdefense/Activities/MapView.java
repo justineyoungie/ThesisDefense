@@ -70,11 +70,15 @@ public class MapView extends SurfaceView implements Runnable {
     // The current m_Score
     private int m_Score;
 
+    private int currentWave = 0;
+    private int maxWave = 5;
+
     /*// The location in the grid of all the segments
     private int[] m_SnakeXs;
     private int[] m_SnakeYs;*/
 
     private Bitmap bitmapWizard;
+    private Bitmap bitmapBackground;
 
     private Point[][] map;
 
@@ -108,7 +112,7 @@ public class MapView extends SurfaceView implements Runnable {
         m_ScreenHeight = size.y;
 
         //Determine the size of each block/place on the game board
-        m_BlockSize = m_ScreenWidth / 9;
+        m_BlockSize = m_ScreenWidth / 10;
         // How many blocks of the same size will fit into the height
         m_NumBlocksHigh = m_ScreenHeight / 6;
 
@@ -120,6 +124,7 @@ public class MapView extends SurfaceView implements Runnable {
         m_Paint = new Paint();
 
         bitmapWizard = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard);
+        bitmapBackground = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
         map = new Point[5][8];
 
         // Start the game
@@ -162,7 +167,7 @@ public class MapView extends SurfaceView implements Runnable {
         // Load the points of each tile
         for(int y = 0; y < map.length; y++){
             for(int x = 0; x < map[y].length; x++){
-                map[y][x] = new Point(m_BlockSize * (x + 1),m_NumBlocksHigh * (y + 1));
+                map[y][x] = new Point(m_BlockSize * (x + 2),m_NumBlocksHigh * (y + 1));
             }
         }
 
@@ -199,27 +204,30 @@ public class MapView extends SurfaceView implements Runnable {
             m_Canvas = m_Holder.lockCanvas();
 
             // Clear the screen with my favorite color
-            m_Canvas.drawColor(Color.argb(255, 51, 181, 229));
+            //m_Canvas.drawColor(Color.argb(255, 51, 181, 229));
 
 
+            // draw background
+            final int bgWidth = bitmapBackground.getWidth();
+            final int bgHeight = bitmapBackground.getHeight();
 
-
-        /*
-            // Choose how big the score will be
-            m_Paint.setTextSize(30);
-            m_Canvas.drawText("Score:" + m_Score, 10, 30, m_Paint);
-        */
+            for(int y = 0; y < m_ScreenHeight; y+= bgHeight){
+                for(int x = 0; x < m_ScreenWidth; x += bgWidth){
+                    m_Canvas.drawBitmap(bitmapBackground, x, y, null);
+                }
+            }
 
             //Draw the map
             for (int i = 0; i < map.length; i++) {
                 for(int j = 0; j < map[i].length; j++){
-                    if((i + j) % 2== 0) m_Paint.setColor(Color.rgb(168, 75, 18));
-                    else    m_Paint.setColor(Color.rgb(242, 152, 96));
+                    if((i + j) % 2== 0) m_Paint.setColor(Color.argb(150,168, 75, 18));
+                    else    m_Paint.setColor(Color.argb(150, 242, 152, 96));
                     m_Canvas.drawRect(map[i][j].x, map[i][j].y,
                             map[i][j].x + m_BlockSize, map[i][j].y + m_NumBlocksHigh, m_Paint);
                 }
             }
 
+            m_Paint.setColor(Color.rgb(0,0,0));
             // to use density pixels instead of actual pixels of image
 
             //Draw the ally
@@ -227,6 +235,22 @@ public class MapView extends SurfaceView implements Runnable {
             Rect dst = new Rect(map[0][0].x, map[0][0].y, map[0][0].x + m_BlockSize, map[0][0].y + m_NumBlocksHigh);
             m_Canvas.drawBitmap(bitmapWizard, src, dst, m_Paint);
 
+
+            // Choose how big the score will be
+            m_Paint.setTextSize(30);
+            m_Paint.setColor(Color.rgb(255, 255, 255));
+            m_Canvas.drawText("Coins: " + m_Score, (int) 500 * scale, (int)40 * scale, m_Paint);
+
+
+            m_Canvas.drawText("Wave: " + currentWave + "/" + maxWave, (int) 400 * scale, (int)40 * scale, m_Paint);
+
+            Bitmap pause = BitmapFactory.decodeResource(this.getResources(), android.R.drawable.ic_media_pause);
+            src = new Rect(0, 0, pause.getWidth(), pause.getHeight());
+            dst = new Rect( Math.round(580 * scale),
+                            Math.round(20 * scale),
+                            Math.round(610 * scale),
+                            Math.round(50 * scale));
+            m_Canvas.drawBitmap(pause, src, dst, m_Paint);
             // Draw the whole frame
             m_Holder.unlockCanvasAndPost(m_Canvas);
         }

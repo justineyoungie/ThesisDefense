@@ -1,16 +1,10 @@
 package com.thesis.thesisdefense.Activities;
 
-import android.annotation.SuppressLint;
 import android.graphics.Point;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Display;
-import android.view.MotionEvent;
-import android.view.View;
 
-import com.thesis.thesisdefense.R;
 
 public class Level extends AppCompatActivity {
 
