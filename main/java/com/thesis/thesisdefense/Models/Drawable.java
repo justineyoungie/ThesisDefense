@@ -30,32 +30,16 @@ public abstract class Drawable extends Object {
         return posX;
     }
 
-    public void setPosX(int posX) {
-        this.posX = posX;
-    }
-
     public int getPosY() {
         return posY;
-    }
-
-    public void setPoxY(int poxY) {
-        this.posY = poxY;
     }
 
     public int getScaledWidth() {
         return sizeX;
     }
 
-    public void setWidth(int sizeX) {
-        this.sizeX = sizeX;
-    }
-
     public int getScaledHeight() {
         return sizeY;
-    }
-
-    public void setHeight(int sizeY) {
-        this.sizeY = sizeY;
     }
 
     public int getImageWidth() { return image.getWidth(); }

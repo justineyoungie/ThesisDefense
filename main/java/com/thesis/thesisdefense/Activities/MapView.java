@@ -87,6 +87,8 @@ public class MapView extends SurfaceView implements Runnable {
     private Bitmap bitmapWizard;
     private Bitmap bitmapBackground;
     private Bitmap bitmapWizardIcon;
+    private Bitmap bitmapWizardIconDisabled;
+    private Bitmap bitmapWizardTransparent;
 
     /*
         For drawing allies to the map
@@ -139,7 +141,10 @@ public class MapView extends SurfaceView implements Runnable {
 
         bitmapWizard = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard);
         bitmapBackground = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
-        bitmapWizardIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizardicon);
+        bitmapWizardIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard_icon);
+        bitmapWizardIconDisabled = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard_icon_disabled);
+        bitmapWizardTransparent = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard_transparent);
+
         map = new Point[5][8];
 
         // Start the game
@@ -258,8 +263,8 @@ public class MapView extends SurfaceView implements Runnable {
                         src = new Rect((ally.getCurrentFrame() - ally.getIncrementX()), 0, ally.getCurrentFrame(), ally.getImageHeight());
                         dst = new Rect( map[y][x].x,
                                         map[y][x].y,
-                                        Math.round(map[y][x].x + ally.getIncrementX() + 50),
-                                        Math.round(map[y][x].y + m_NumBlocksHigh));
+                                        map[y][x].x + ally.getIncrementX() + 50,
+                                        map[y][x].y + m_NumBlocksHigh);
                         m_Canvas.drawBitmap(bitmapWizard, src, dst, m_Paint);
                     }
                 }
@@ -291,18 +296,36 @@ public class MapView extends SurfaceView implements Runnable {
                             Math.round((bitmapWizardIcon.getWidth() - 30) * scale),
                             Math.round((bitmapWizardIcon.getHeight() - 30) * scale));
 
-            m_Canvas.drawBitmap(bitmapWizardIcon, src, dst, m_Paint);
+            if(isSelecting) m_Canvas.drawBitmap(bitmapWizardIconDisabled, src, dst, m_Paint);
+            else            m_Canvas.drawBitmap(bitmapWizardIcon, src, dst, m_Paint);
 
 
             // if user is dragging an ally from the options to the map
             if(isSelecting){
-                src = new Rect(0, 0, bitmapWizard.getWidth() / 4, bitmapWizard.getHeight()); //only the first frame
-                dst = new Rect( cursorLocation.x - (bitmapWizard.getWidth() / 8), // to center the image on the cursor
-                                cursorLocation.y - (bitmapWizard.getHeight() / 2),
-                                (int) (cursorLocation.x + (bitmapWizard.getWidth() / 8 - 30) * scale),
-                                (int) (cursorLocation.y + (bitmapWizard.getHeight() / 2 - 30) * scale));
+                src = new Rect(0, 0, bitmapWizardTransparent.getWidth(), bitmapWizardTransparent.getHeight());
+                dst = new Rect( cursorLocation.x - bitmapWizardTransparent.getWidth() / 2, // to center the image on the cursor
+                                cursorLocation.y - bitmapWizardTransparent.getHeight() / 2,
+                                cursorLocation.x + bitmapWizardTransparent.getWidth(),
+                                cursorLocation.y + m_NumBlocksHigh - bitmapWizardTransparent.getHeight() / 2);
+                for(int y = 0; y < map.length; y++){
+                    for(int x = 0; x < map[y].length; x++){
+                        if( cursorLocation.x >= map[y][x].x &&
+                            cursorLocation.x <= map[y][x].x + m_BlockSize &&
+                            cursorLocation.y >= map[y][x].y &&
+                            cursorLocation.y <= map[y][x].y + m_NumBlocksHigh &&
+                            allyMap[y][x] == null){ // if within a block inside map and has no one occupying it
+                            dst = new Rect( map[y][x].x, // to center the image on the cursor
+                                            map[y][x].y,
+                                            map[y][x].x + bitmapWizardTransparent.getWidth() + 50,
+                                            map[y][x].y + m_NumBlocksHigh);
+                            Log.e(TAG, "Coord: (" + map[y][x].x + ", " + map[y][x].y + ");" +
+                                    " Index: (" + y + ", " + x + ")");
+                        }
+                    }
+                }
 
-                m_Canvas.drawBitmap(bitmapWizard, src, dst, null);
+
+                m_Canvas.drawBitmap(bitmapWizardTransparent, src, dst, null);
             }
 
             // Draw the whole frame
@@ -386,14 +409,12 @@ public class MapView extends SurfaceView implements Runnable {
                             motionEvent.getX() <= map[y][x].x + m_BlockSize &&
                             motionEvent.getY() >= map[y][x].y &&
                             motionEvent.getY() <= map[y][x].y + m_NumBlocksHigh &&
-                            isSelecting){
-
-                            isSelecting = false;
-                            Log.e(TAG, "Coord: (" + map[y][x].x + ", " + map[y][x].y + ");" +
-                                    " Index: (" + y + ", " + x + ")");
+                            isSelecting && allyMap[y][x] == null){
+                            allyMap[y][x] = new Wizard(map[y][x].x, map[y][x].y, x, y, bitmapWizard, scale);
                         }
                     }
                 }
+                isSelecting = false;
         }
         return true;
     }
