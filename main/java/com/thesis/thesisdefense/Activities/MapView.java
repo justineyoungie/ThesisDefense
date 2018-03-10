@@ -3,6 +3,7 @@ package com.thesis.thesisdefense.Activities;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -18,6 +19,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.thesis.thesisdefense.Models.Ally;
+import com.thesis.thesisdefense.Models.Wizard;
 import com.thesis.thesisdefense.R;
 
 import java.io.IOException;
@@ -27,6 +29,8 @@ import java.io.IOException;
  */
 
 public class MapView extends SurfaceView implements Runnable {
+
+    static final String TAG = "Thesis Defense";
 
     // All the code will run separately to the UI
     private Thread m_Thread = null;
@@ -67,6 +71,9 @@ public class MapView extends SurfaceView implements Runnable {
     private final long MILLIS_IN_A_SECOND = 1000;
     // We will draw the frame much more often
 
+    //pause of attack animation for wizard in milliseconds
+    //to be set in updateGame()
+
     // The current m_Score
     private int m_Score;
 
@@ -79,16 +86,25 @@ public class MapView extends SurfaceView implements Runnable {
 
     private Bitmap bitmapWizard;
     private Bitmap bitmapBackground;
+    private Bitmap bitmapWizardIcon;
+
+    /*
+        For drawing allies to the map
+     */
+    private boolean isSelecting;
+    // private Ally selectedAlly;
+    private Point cursorLocation = new Point();
 
     private Point[][] map;
 
     /*
         not yet implemented but needed
      */
-    private Ally[][] allyMap;
+    private Ally[][] allyMap = new Ally[5][8];
 
 
     float scale = getResources().getDisplayMetrics().density;
+
 
     private int x = Math.round(74 * scale);
     private int y = Math.round(44 * scale);
@@ -99,8 +115,6 @@ public class MapView extends SurfaceView implements Runnable {
     // The size in pixels of one tile
     private int m_BlockSize;
     private int m_NumBlocksHigh; // determined dynamically
-
-    private boolean forwardAnimation = true;
 
 
 
@@ -125,6 +139,7 @@ public class MapView extends SurfaceView implements Runnable {
 
         bitmapWizard = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard);
         bitmapBackground = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
+        bitmapWizardIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizardicon);
         map = new Point[5][8];
 
         // Start the game
@@ -138,7 +153,6 @@ public class MapView extends SurfaceView implements Runnable {
         // The check for m_Playing prevents a crash at the start
         // You could also extend the code to provide a pause feature
         while (m_Playing) {
-
             // Update 10 times a second
             if(checkForUpdate()) {
                 updateGame();
@@ -173,6 +187,9 @@ public class MapView extends SurfaceView implements Runnable {
 
         // Reset the m_Score
         m_Score = 0;
+        allyMap[4][3] = new Wizard(map[4][3].x, map[4][3].y,
+                3, 4,
+                bitmapWizard, scale);
 
         // Setup m_NextFrameTime so an update is triggered immediately
         m_NextFrameTime = System.currentTimeMillis();
@@ -230,10 +247,24 @@ public class MapView extends SurfaceView implements Runnable {
             m_Paint.setColor(Color.rgb(0,0,0));
             // to use density pixels instead of actual pixels of image
 
+            Rect src;
+            Rect dst;
             //Draw the ally
-            Rect src = new Rect(x - incrementX, 0, x, y);
-            Rect dst = new Rect(map[0][0].x, map[0][0].y, map[0][0].x + m_BlockSize, map[0][0].y + m_NumBlocksHigh);
-            m_Canvas.drawBitmap(bitmapWizard, src, dst, m_Paint);
+            for(int y = 0; y < allyMap.length; y++){
+                for(int x = 0; x < allyMap[y].length; x++){
+                    if(allyMap[y][x] != null){
+                        Ally ally = allyMap[y][x];
+
+                        src = new Rect((ally.getCurrentFrame() - ally.getIncrementX()), 0, ally.getCurrentFrame(), ally.getImageHeight());
+                        dst = new Rect( map[y][x].x,
+                                        map[y][x].y,
+                                        Math.round(map[y][x].x + ally.getIncrementX() + 50),
+                                        Math.round(map[y][x].y + m_NumBlocksHigh));
+                        m_Canvas.drawBitmap(bitmapWizard, src, dst, m_Paint);
+                    }
+                }
+            }
+
 
 
             // Choose how big the score will be
@@ -244,6 +275,7 @@ public class MapView extends SurfaceView implements Runnable {
 
             m_Canvas.drawText("Wave: " + currentWave + "/" + maxWave, (int) 400 * scale, (int)40 * scale, m_Paint);
 
+            //pause button
             Bitmap pause = BitmapFactory.decodeResource(this.getResources(), android.R.drawable.ic_media_pause);
             src = new Rect(0, 0, pause.getWidth(), pause.getHeight());
             dst = new Rect( Math.round(580 * scale),
@@ -251,6 +283,28 @@ public class MapView extends SurfaceView implements Runnable {
                             Math.round(610 * scale),
                             Math.round(50 * scale));
             m_Canvas.drawBitmap(pause, src, dst, m_Paint);
+
+            // wizard icon for selection
+            src = new Rect(0, 0, bitmapWizardIcon.getWidth(), bitmapWizardIcon.getHeight());
+            dst = new Rect( Math.round(40*scale),
+                            Math.round(10*scale),
+                            Math.round((bitmapWizardIcon.getWidth() - 30) * scale),
+                            Math.round((bitmapWizardIcon.getHeight() - 30) * scale));
+
+            m_Canvas.drawBitmap(bitmapWizardIcon, src, dst, m_Paint);
+
+
+            // if user is dragging an ally from the options to the map
+            if(isSelecting){
+                src = new Rect(0, 0, bitmapWizard.getWidth() / 4, bitmapWizard.getHeight()); //only the first frame
+                dst = new Rect( cursorLocation.x - (bitmapWizard.getWidth() / 8), // to center the image on the cursor
+                                cursorLocation.y - (bitmapWizard.getHeight() / 2),
+                                (int) (cursorLocation.x + (bitmapWizard.getWidth() / 8 - 30) * scale),
+                                (int) (cursorLocation.y + (bitmapWizard.getHeight() / 2 - 30) * scale));
+
+                m_Canvas.drawBitmap(bitmapWizard, src, dst, null);
+            }
+
             // Draw the whole frame
             m_Holder.unlockCanvasAndPost(m_Canvas);
         }
@@ -275,19 +329,35 @@ public class MapView extends SurfaceView implements Runnable {
 
     public void updateGame() {
 
+        for(int y = 0; y < allyMap.length; y++){
+            for(int x = 0; x < allyMap[y].length; x++){
+                if(allyMap[y][x] != null){
+                    Ally ally = allyMap[y][x];
+                    if(ally instanceof Wizard) {
 
-        Log.e("X Coord", x + "");
-        if(x < 296 * scale && forwardAnimation) {
-            x += incrementX;
-        }
-        else if (x >= 296 * scale && forwardAnimation){
-            forwardAnimation = false;
-        }
-        else if (!forwardAnimation && x > incrementX)
-            x -= incrementX;
-        else{
-            forwardAnimation = true;
-            m_NextFrameTime = System.currentTimeMillis() + MILLIS_IN_A_SECOND;
+                        if (ally.getCurrentFrame() < ally.getImageWidth() && //if not yet out of bounds in src image
+                           ((Wizard) ally).isForward() && //forward animation for wizards
+                           ally.getPauseCountdown() == 1000) { // not yet paused for
+                            ally.nextFrame();
+                        }
+
+                        else if(ally.getCurrentFrame() >= ally.getImageWidth() && //if out of bounds
+                                ((Wizard) ally).isForward()){ //and still going forward
+                            ((Wizard) ally).toggleForwardAnimation(); //make animation go backwards
+                        }
+
+                        else if(!((Wizard) ally).isForward() && //if not going forward
+                                ally.getCurrentFrame() > ally.getIncrementX()){ //and not yet out of bounds
+                            ((Wizard) ally).previousFrame();
+                        }
+
+                        else{
+                            if(ally.pauseCountdown(FPS))
+                                ((Wizard) ally).toggleForwardAnimation();
+                        }
+                    }
+                }
+            }
         }
 
     }
@@ -295,36 +365,33 @@ public class MapView extends SurfaceView implements Runnable {
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_DOWN:
+                if( motionEvent.getX() >= Math.round(40 * scale) &&
+                    motionEvent.getX() <= Math.round((bitmapWizardIcon.getWidth() - 30 ) * scale) &&
+                    motionEvent.getY() >= Math.round(10 * scale) &&
+                    motionEvent.getY() <= Math.round((bitmapWizardIcon.getHeight() - 30 )* scale)){
+                    isSelecting = true;
+                    cursorLocation.x = (int) motionEvent.getX();
+                    cursorLocation.y = (int) motionEvent.getY();
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                cursorLocation.x = (int) motionEvent.getX();
+                cursorLocation.y = (int) motionEvent.getY();
+                break;
             case MotionEvent.ACTION_UP:
-                if (motionEvent.getX() >= m_ScreenWidth / 2) {
-                    switch(m_Direction){
-                        case UP:
-                            m_Direction = Direction.RIGHT;
-                            break;
-                        case RIGHT:
-                            m_Direction = Direction.DOWN;
-                            break;
-                        case DOWN:
-                            m_Direction = Direction.LEFT;
-                            break;
-                        case LEFT:
-                            m_Direction = Direction.UP;
-                            break;
-                    }
-                } else {
-                    switch(m_Direction){
-                        case UP:
-                            m_Direction = Direction.LEFT;
-                            break;
-                        case LEFT:
-                            m_Direction = Direction.DOWN;
-                            break;
-                        case DOWN:
-                            m_Direction = Direction.RIGHT;
-                            break;
-                        case RIGHT:
-                            m_Direction = Direction.UP;
-                            break;
+                for(int y = 0; y < map.length; y++){
+                    for(int x = 0; x < map[y].length; x++){
+                        if( motionEvent.getX() >= map[y][x].x &&
+                            motionEvent.getX() <= map[y][x].x + m_BlockSize &&
+                            motionEvent.getY() >= map[y][x].y &&
+                            motionEvent.getY() <= map[y][x].y + m_NumBlocksHigh &&
+                            isSelecting){
+
+                            isSelecting = false;
+                            Log.e(TAG, "Coord: (" + map[y][x].x + ", " + map[y][x].y + ");" +
+                                    " Index: (" + y + ", " + x + ")");
+                        }
                     }
                 }
         }
