@@ -31,8 +31,10 @@ public abstract class Fighter extends Drawable {
     protected long pauseCountdown;
     protected boolean isAttacking = false;
     protected boolean readyToAttack = true;
+    protected double range;
 
-    public Fighter(int posX, int poxY, int maxHealth, int damage, Bitmap image, float scale, int idleFrame, int numberOfFrames, long attackPause) {
+    protected boolean kill = false; //Ready to damage the foe
+    public Fighter(int posX, int poxY, int maxHealth, int damage, Bitmap image, float scale, int idleFrame, int numberOfFrames, long attackPause, double range) {
         super(posX, poxY, image, scale);
         this.maxHealth = maxHealth;
         this.currentHealth = maxHealth;
@@ -42,6 +44,7 @@ public abstract class Fighter extends Drawable {
         this.idleFrame = idleFrame * incrementX;
         this.attackPause = attackPause;
         this.pauseCountdown = attackPause;
+        this.range = range;
     }
 
     /**
@@ -118,7 +121,8 @@ public abstract class Fighter extends Drawable {
         // if attacking and current frame exceeds image width (more than end of attacking frames)
         else if(isAttacking && currentFrame >= getImageWidth()) {
             readyToAttack = false; // attack has finished and needs to pause
-            toggleAttacking(); // is no longer attacking
+            kill = true;
+            //toggleAttacking(); // is no longer attacking
             setToStartingFrame(); // reset animation for idle animation
         }
 
@@ -147,9 +151,9 @@ public abstract class Fighter extends Drawable {
     public void pauseCountdown(){
         if(!isAttacking) {
             if(!readyToAttack) {
-                pauseCountdown -= 1000 / FPS; // 1000 here is number of millis in a second
+                pauseCountdown --; // 1000 here is number of millis in a second (im just ganna assume its per tick)
                 if (pauseCountdown <= 0) {
-                    pauseCountdown = attackPause*100; //my intuition is telling me this should be *100
+                    pauseCountdown = attackPause;
                     readyToAttack = true;
                 }
             }
@@ -169,6 +173,16 @@ public abstract class Fighter extends Drawable {
 
     public void setToStartingFrame(){
         currentFrame = incrementX;
+    }
+
+    public int takeDamage(int dmg){
+        if(currentHealth -dmg <0){
+            currentHealth = 0;
+        }
+        else{
+            currentHealth -= dmg;
+        }
+        return currentHealth;
     }
 
 }

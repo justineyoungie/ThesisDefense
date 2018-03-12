@@ -18,15 +18,16 @@ public abstract class Enemy extends Fighter{
 
     protected int LaneY;
     protected double speed;
-    protected boolean inCombat = false;
+    protected Ally Rival; // The ally the enemy is currently fighting
 
     public Enemy(int posX, int poxY, int maxHealth, int damage, long attackPause,
                 int LaneY, Bitmap image, float scale, int idleFrame,
-                int numberOfFrames, double speed) {
-        super(posX, poxY, maxHealth, damage, image, scale, idleFrame, numberOfFrames, attackPause);
+                int numberOfFrames, double speed, double range) {
+        super(posX, poxY, maxHealth, damage, image, scale, idleFrame, numberOfFrames, attackPause, range);
 
         this.LaneY = LaneY; //which lane the enemey is
         this.speed = speed;
+        Rival = null;
         //FPS is how fast it moves and attacks
     }
 
