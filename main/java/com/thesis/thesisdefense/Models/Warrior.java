@@ -3,20 +3,17 @@ package com.thesis.thesisdefense.Models;
 import android.graphics.Bitmap;
 
 /**
- * Created by justine on 3/10/18.
+ * Created by justine on 3/12/18.
  */
 
-public class Wizard extends Ally{
+public class Warrior extends Ally {
 
     public static int FRAME_WIDTH;
     public static int FRAME_HEIGHT;
 
-    public Wizard(int posX, int poxY, int indexX, int indexY, Bitmap image, float scale) {
-        super(posX, poxY, 5, 1, 1000, indexX, indexY, image, scale, 1, 4);
+    public Warrior(int posX, int poxY, int indexX, int indexY, Bitmap image, float scale) {
+        super(posX, poxY, 7, 2, 500, indexX, indexY, image, scale, 4, 10);
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.getImageHeight();
-
     }
-
-
 }

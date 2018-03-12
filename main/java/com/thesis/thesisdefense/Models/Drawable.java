@@ -46,4 +46,6 @@ public abstract class Drawable extends Object {
 
     public int getImageHeight() { return image.getHeight(); }
 
+    public Bitmap getImage() { return image; }
+
 }

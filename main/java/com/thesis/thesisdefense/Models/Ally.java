@@ -10,44 +10,18 @@ public abstract class Ally extends Fighter{
 
     protected int indexX; //index in map array
     protected int indexY;
-    protected long attackPause;
-    protected long pauseCountdown;
-    protected boolean isPaused = false;
+
+    /*
+        maxHealth, damage, attackPause are hardcoded in constructors of child classes and is dependent on class
+        idleFrame, numberOfFrames are hardcoded in constructors but highly dependent on asset design
+    */
 
     public Ally(int posX, int poxY, int maxHealth, int damage, long attackPause,
-                int indexX, int indexY, Bitmap image, float scale) {
-        super(posX, poxY, maxHealth, damage, image, scale);
-        this.attackPause = attackPause;
-        this.pauseCountdown = attackPause;
+                int indexX, int indexY, Bitmap image, float scale, int idleFrame,
+                int numberOfFrames) {
+        super(posX, poxY, maxHealth, damage, image, scale, idleFrame, numberOfFrames, attackPause);
         this.indexX = indexX;
         this.indexY = indexY;
-    }
-
-    public long getAttackPause(){
-        return attackPause;
-    }
-
-    public long getPauseCountdown(){
-        return pauseCountdown;
-    }
-
-    public boolean pauseCountdown(long FPS){
-        if(isPaused) {
-            pauseCountdown -= 1000 / FPS; // 1000 here is number of millis in a second
-            if (pauseCountdown <= 0) {
-                pauseCountdown = attackPause;
-                isPaused = false;
-            }
-        }
-        else{
-            isPaused = true;
-        }
-
-        return !isPaused;
-    }
-
-    public boolean isPaused(){
-        return isPaused;
     }
 
 }
