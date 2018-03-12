@@ -14,7 +14,7 @@ import com.thesis.thesisdefense.Activities.MapView;
  */
 
 public abstract class Fighter extends Drawable {
-    private long FPS = 10;
+    protected long FPS = 10;
 
     protected int maxHealth;
     protected int currentHealth;
@@ -44,18 +44,6 @@ public abstract class Fighter extends Drawable {
         this.pauseCountdown = attackPause;
     }
 
-    public Fighter(int posX, int poxY, int maxHealth, int damage, Bitmap image, float scale, int idleFrame, int numberOfFrames, long attackPause, long FPS) {
-        super(posX, poxY, image, scale);
-        this.maxHealth = maxHealth;
-        this.currentHealth = maxHealth;
-        this.damage = damage;
-        this.incrementX = image.getWidth() / numberOfFrames;
-        this.currentFrame = incrementX;
-        this.idleFrame = idleFrame * incrementX;
-        this.attackPause = attackPause;
-        this.pauseCountdown = attackPause;
-        this.FPS = FPS;
-    }
     /**
      * Subtracts damage to current health of fighter
      *
@@ -161,7 +149,7 @@ public abstract class Fighter extends Drawable {
             if(!readyToAttack) {
                 pauseCountdown -= 1000 / FPS; // 1000 here is number of millis in a second
                 if (pauseCountdown <= 0) {
-                    pauseCountdown = attackPause;
+                    pauseCountdown = attackPause*100; //my intuition is telling me this should be *100
                     readyToAttack = true;
                 }
             }
@@ -183,7 +171,4 @@ public abstract class Fighter extends Drawable {
         currentFrame = incrementX;
     }
 
-    public long getFPS(){
-        return FPS;
-    }
 }

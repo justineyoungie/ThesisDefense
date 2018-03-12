@@ -17,15 +17,20 @@ public abstract class Enemy extends Fighter{
     */
 
     protected int LaneY;
-
+    protected double speed;
+    protected boolean inCombat = false;
 
     public Enemy(int posX, int poxY, int maxHealth, int damage, long attackPause,
                 int LaneY, Bitmap image, float scale, int idleFrame,
-                int numberOfFrames, long FPS) {
-        super(posX, poxY, maxHealth, damage, image, scale, idleFrame, numberOfFrames, attackPause, FPS);
+                int numberOfFrames, double speed) {
+        super(posX, poxY, maxHealth, damage, image, scale, idleFrame, numberOfFrames, attackPause);
 
         this.LaneY = LaneY; //which lane the enemey is
+        this.speed = speed;
         //FPS is how fast it moves and attacks
     }
 
+    public void updateEnemy(Ally[][] allyMap, int m_BlockSize){
+        //must @Override this method
+    }
 }
