@@ -22,18 +22,15 @@ public class Panelist extends Enemy{
     public void updateEnemy(Ally[][] allyMap, int m_BlockSize){
 
         //checks every ally in the Lane
-        for(int i = 0; i < allyMap[this.LaneY].length; i++){
-            Ally ally = allyMap[this.LaneY][i];
-            if(ally != null){
-                if(this.posX <= ally.posX+m_BlockSize*ally.range-30 && this.posX > ally.posX + 30 && !ally.enemies.contains(this)){ //if enemy is in ally's range, add this to his encounter
-                    ally.encounterEnemy(this);
-                }
-                if(this.posX <= ally.posX+m_BlockSize*range-30 && this.posX > ally.posX + 30 && this.Rival == null){ //add ally to enemys encounter if ally is in range
-                    this.Rival = ally;
+        if(this.Rival == null) {
+            for(int i = 0; i < allyMap[this.LaneY].length; i++){
+                Ally ally = allyMap[this.LaneY][i];
+                if(ally != null){
+                    if(this.posX <= ally.posX+m_BlockSize*range-30 && this.posX > ally.posX + 30 && this.Rival == null){ //add ally to enemys encounter if ally is in range
+                        this.Rival = ally;
+                    }
                 }
             }
-        }
-        if(this.Rival == null) {
             this.posX -= this.speed;
         }
         this.nextFrame();

@@ -204,7 +204,7 @@ public class MapView extends SurfaceView implements Runnable {
                 bitmapWarrior, scale);
 
         allyMap[1][0] = new Wizard(map[1][0].x, map[1][0].y,
-                1, 0,
+                0, 1,
                 bitmapWizard, scale);
 
         // Setup m_NextFrameTime so an update is triggered immediately
@@ -422,7 +422,7 @@ public class MapView extends SurfaceView implements Runnable {
                 if(allyMap[y][x] != null){
                     Ally ally = allyMap[y][x];
                     ally.nextFrame();
-                    ally.updateAlly();
+                    ally.updateAlly(enemies, m_BlockSize);
                 }
             }
         }

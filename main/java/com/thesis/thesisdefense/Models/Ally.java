@@ -14,6 +14,7 @@ public abstract class Ally extends Fighter{
     protected int indexY;
 
     protected ArrayList<Enemy> enemies;
+
     /*
         maxHealth, damage, attackPause are hardcoded in constructors of child classes and is dependent on class
         idleFrame, numberOfFrames are hardcoded in constructors but highly dependent on asset design
@@ -28,7 +29,14 @@ public abstract class Ally extends Fighter{
         enemies = new ArrayList<>();
     }
 
-    public void updateAlly(){
+    public void updateAlly(ArrayList<Enemy> curEnemies, int m_BlockSize){
+        for(int i = 0; i < curEnemies.size(); i++){
+            Enemy enemy = curEnemies.get(i);
+            if(!enemies.contains(enemy) && enemy.LaneY == indexY && enemy.getCurrentHealth() != 0 && enemy.getPosX() <= this.posX+m_BlockSize*range+30
+                    && enemy.getPosX() > this.posX +30){
+                encounterEnemy(enemy);
+            }
+        }
         while(enemies.size() != 0 && enemies.get(0).getCurrentHealth() == 0){
             enemies.remove(0);
         }
