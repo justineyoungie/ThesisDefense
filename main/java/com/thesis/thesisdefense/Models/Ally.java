@@ -29,29 +29,36 @@ public abstract class Ally extends Fighter{
         enemies = new ArrayList<>();
     }
 
-    public void updateAlly(ArrayList<Enemy> curEnemies, int m_BlockSize){
+    // returns 0 if no enemy was killed, returns the score of the enemy killed if otherwise
+    public int updateAlly(ArrayList<Enemy> curEnemies, int m_BlockSize){
+        nextFrame();
         for(int i = 0; i < curEnemies.size(); i++){
             Enemy enemy = curEnemies.get(i);
-            if(!enemies.contains(enemy) && enemy.LaneY == indexY && enemy.getCurrentHealth() != 0 && enemy.getPosX() <= this.posX+m_BlockSize*range+30
-                    && enemy.getPosX() > this.posX +30){
+            if(!enemies.contains(enemy) && enemy.LaneY == indexY && enemy.getCurrentHealth() != 0 &&
+                    enemy.getPosX() <= this.posX+m_BlockSize*range+30 && enemy.getPosX() + (m_BlockSize + 60) / 2 > this.posX +30){
                 encounterEnemy(enemy);
             }
         }
-        while(enemies.size() != 0 && enemies.get(0).getCurrentHealth() == 0){
+        while(enemies.size() != 0 && enemies.get(0).isDead()){
             enemies.remove(0);
         }
         if (enemies.size() == 0) {
             this.isAttacking = false;
         }
         else {
-            if(!this.isAttacking){
+            if(!this.isAttacking && this.readyToAttack){
                 this.isAttacking = true;
             }
             if(this.kill){
-                int eHealth = enemies.get(0).takeDamage(this.damage); //get health after current dmg, idk wat to do with it xd it was handled by the loop
+                boolean isDead = enemies.get(0).calculateDamage(this.damage); //get health after current dmg, idk wat to do with it xd it was handled by the loop
                 kill = false;
+
+                if (isDead){
+                    return enemies.get(0).getScore();
+                }
             }
         }
+        return 0;
     }
     public void encounterEnemy(Enemy enemy){ //when enemy is in range,
         enemies.add(enemy);
