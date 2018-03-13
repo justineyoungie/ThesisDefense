@@ -13,6 +13,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -88,11 +89,12 @@ public class MapView extends SurfaceView implements Runnable {
     private Bitmap bitmapWizard;
     private Bitmap bitmapBackground;
     private Bitmap bitmapWizardIcon;
-    private Bitmap bitmapWizardIconDisabled;
-    private Bitmap bitmapWizardTransparent;
     private Bitmap bitmapWarrior;
     private Bitmap bitmapWarriorIcon;
     private Bitmap bitmapPanelist;
+    private Bitmap bitmapThesis;
+    private Bitmap bitmapCastle;
+
     /*
         For drawing allies to the map
      */
@@ -118,6 +120,8 @@ public class MapView extends SurfaceView implements Runnable {
     private int m_NumBlocksHigh; // determined dynamically
 
     public ArrayList<Enemy> enemies;
+    private MediaPlayer player;
+
 
     public MapView(Context context, Point size) {
         super(context);
@@ -143,8 +147,6 @@ public class MapView extends SurfaceView implements Runnable {
         // wizard
         bitmapWizard = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard);
         bitmapWizardIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard_icon);
-        bitmapWizardIconDisabled = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard_icon_disabled);
-        bitmapWizardTransparent = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard_transparent);
 
         bitmapWarrior = decodeSampleBitmapFromResource(this.getResources(), R.drawable.warrior, 200, 200);
         bitmapWarriorIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.warrior_icon);
@@ -154,6 +156,11 @@ public class MapView extends SurfaceView implements Runnable {
         map = new Point[5][8];
 
         enemies = new ArrayList<>();
+        bitmapCastle = decodeSampleBitmapFromResource(this.getResources(), R.drawable.castle, 300, m_ScreenHeight);
+        bitmapThesis = BitmapFactory.decodeResource(this.getResources(), R.drawable.thesis);
+
+
+        loadSound();
         // Start the game
         startGame();
 
@@ -170,7 +177,9 @@ public class MapView extends SurfaceView implements Runnable {
                 updateGame();
                 drawGame();
             }
-
+        }
+        if(!m_Playing){
+            drawGame();
         }
     }
 
@@ -216,7 +225,42 @@ public class MapView extends SurfaceView implements Runnable {
     }
 
     public void loadSound() {
+        AssetFileDescriptor afd = null;
+        try {
+            afd = this.getContext().getAssets().openFd("battle_theme.mp3");
+            player = new MediaPlayer();
+            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    Log.e(TAG, "Henlo");
+                    mp.start();
+                }
+            });
+            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    Log.e(TAG, "Henloers");
+                    mp.start();
+                }
+            });
+            player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    Log.e(TAG, "wew");
+                    return false;
+                }
+            });
+            player.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());
+            Log.e(TAG, "Henlongers");
+            player.prepare();
+            player.start();
+        } catch (IOException e) {
+            Log.e(TAG, "error");
+            e.printStackTrace();
+        }
+       /*
         m_SoundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+
         try {
             // Create objects of the 2 required classes
             // Use m_Context because this is a reference to the Activity
@@ -233,6 +277,7 @@ public class MapView extends SurfaceView implements Runnable {
         } catch (IOException e) {
             // Error
         }
+        */
     }
 
     public void drawGame() {
@@ -243,7 +288,7 @@ public class MapView extends SurfaceView implements Runnable {
             // Clear the screen with my favorite color
             //m_Canvas.drawColor(Color.argb(255, 51, 181, 229));
 
-
+            m_Paint.reset();
             // draw background
             final int bgWidth = bitmapBackground.getWidth();
             final int bgHeight = bitmapBackground.getHeight();
@@ -257,18 +302,30 @@ public class MapView extends SurfaceView implements Runnable {
             //Draw the map
             for (int i = 0; i < map.length; i++) {
                 for(int j = 0; j < map[i].length; j++){
-                    if((i + j) % 2== 0) m_Paint.setColor(Color.argb(150,168, 75, 18));
-                    else    m_Paint.setColor(Color.argb(150, 242, 152, 96));
+                    if((i + j) % 2== 0) m_Paint.setColor(Color.argb(150,70, 140, 46));
+                    else                m_Paint.setColor(Color.argb(150, 76, 154, 75));
                     m_Canvas.drawRect(map[i][j].x, map[i][j].y,
                             map[i][j].x + m_BlockSize, map[i][j].y + m_NumBlocksHigh, m_Paint);
                 }
             }
 
             m_Paint.setColor(Color.rgb(0,0,0));
-            // to use density pixels instead of actual pixels of image
+
 
             Rect src;
             Rect dst;
+
+            src = new Rect(0, 0, bitmapThesis.getWidth(), bitmapThesis.getHeight());
+            for(int i = 0; i < map.length; i++){
+                dst = new Rect( map[i][0].x - m_BlockSize + m_BlockSize / 4, map[i][0].y + m_NumBlocksHigh / 4,
+                                map[i][0].x - m_BlockSize + m_BlockSize / 4 * 3, map[i][0].y + m_NumBlocksHigh / 4 * 3);
+                m_Canvas.drawBitmap(bitmapThesis, src, dst, m_Paint);
+            }
+
+            src = new Rect(0, 0, bitmapCastle.getWidth(), bitmapCastle.getHeight());
+            dst = new Rect((int)(-120 * scale), (int)(-80 * scale), (int) (120 * scale), m_ScreenHeight);
+            m_Canvas.drawBitmap(bitmapCastle, src, dst, m_Paint);
+
             //Draw the ally
             for(int y = 0; y < allyMap.length; y++){
                 for(int x = 0; x < allyMap[y].length; x++){
@@ -328,7 +385,7 @@ public class MapView extends SurfaceView implements Runnable {
                 m_Canvas.drawBitmap(bitmapWizardIcon, src, dst, m_Paint);
 
 
-            m_Paint = new Paint();
+            m_Paint.reset();
 
             // warrior icon for selection
             src = new Rect(0, 0, bitmapWarriorIcon.getWidth(), bitmapWarriorIcon.getHeight());
@@ -344,7 +401,8 @@ public class MapView extends SurfaceView implements Runnable {
             else
                 m_Canvas.drawBitmap(bitmapWarriorIcon, src, dst, m_Paint);
 
-            m_Paint = new Paint();
+
+            m_Paint.reset();
 
 
             // if user is dragging an ally from the options to the map
@@ -390,8 +448,24 @@ public class MapView extends SurfaceView implements Runnable {
                 else if(selectedAlly.equals("Warrior"))
                     m_Canvas.drawBitmap(bitmapWarrior, src, dst, m_Paint);
 
-
             }
+
+
+            // if paused, draw the pause screen
+            if(!m_Playing) {
+                m_Paint.setARGB(60, 0,0,0);
+                m_Canvas.drawRect(0, 0, m_ScreenWidth, m_ScreenHeight, m_Paint);
+
+                m_Paint.setColor(Color.WHITE);
+                m_Paint.setTextAlign(Paint.Align.CENTER);
+                m_Paint.setTextSize(32 * scale);
+                m_Canvas.drawText("PAUSED", m_ScreenWidth / 2, m_ScreenHeight / 2 - 50, m_Paint);
+
+
+                m_Paint.setTextSize(20 * scale);
+                m_Canvas.drawText("(Click anywhere to continue)", m_ScreenWidth / 2, m_ScreenHeight / 2, m_Paint);
+            }
+
 
             // Draw the whole frame
             m_Holder.unlockCanvasAndPost(m_Canvas);
@@ -443,23 +517,33 @@ public class MapView extends SurfaceView implements Runnable {
     public boolean onTouchEvent(MotionEvent motionEvent) {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                if( motionEvent.getX() >= Math.round(40 * scale) &&
-                    motionEvent.getX() <= Math.round(120 * scale) &&
-                    motionEvent.getY() >= Math.round(10 * scale) &&
-                    motionEvent.getY() <= Math.round(50 * scale)){
+                if(!m_Playing){
+                    resume();
+                }
+                else if(motionEvent.getX() >= Math.round(40 * scale) &&
+                        motionEvent.getX() <= Math.round(120 * scale) &&
+                        motionEvent.getY() >= Math.round(10 * scale) &&
+                        motionEvent.getY() <= Math.round(50 * scale)){ // ummm if you touch the wizard icon
                     isSelecting = true;
                     cursorLocation.x = (int) motionEvent.getX();
                     cursorLocation.y = (int) motionEvent.getY();
                     selectedAlly = "Wizard";
                 }
-                else if(motionEvent.getX() >= Math.round(160 * scale) &&
-                        motionEvent.getX() <= Math.round(240 * scale) &&
+                else if(motionEvent.getX() >= Math.round(130 * scale) &&
+                        motionEvent.getX() <= Math.round(200 * scale) &&
                         motionEvent.getY() >= Math.round(10 * scale) &&
-                        motionEvent.getY() <= Math.round(50 * scale)){
+                        motionEvent.getY() <= Math.round(50 * scale)){ // pressed the warrior icon
                     isSelecting = true;
                     cursorLocation.x = (int) motionEvent.getX();
                     cursorLocation.y = (int) motionEvent.getY();
                     selectedAlly = "Warrior";
+                }
+
+                else if(motionEvent.getX() >= Math.round(580 * scale) &&
+                        motionEvent.getX() <= Math.round(610 * scale) &&
+                        motionEvent.getY() >= Math.round(20 * scale) &&
+                        motionEvent.getY() <= Math.round(50 * scale)){
+                    pause();
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -472,8 +556,9 @@ public class MapView extends SurfaceView implements Runnable {
                         if( motionEvent.getX() >= map[y][x].x &&
                             motionEvent.getX() <= map[y][x].x + m_BlockSize &&
                             motionEvent.getY() >= map[y][x].y &&
-                            motionEvent.getY() <= map[y][x].y + m_NumBlocksHigh &&
-                            isSelecting && allyMap[y][x] == null){
+                            motionEvent.getY() <= map[y][x].y + m_NumBlocksHigh && // if user released inside map
+                            isSelecting && allyMap[y][x] == null){ // and no one's occupying the spot
+                            // insert whoever's selected
                             if(selectedAlly.equals("Wizard"))
                                 allyMap[y][x] = new Wizard(map[y][x].x, map[y][x].y, x, y, bitmapWizard, scale);
                             if(selectedAlly.equals("Warrior"))
@@ -482,6 +567,7 @@ public class MapView extends SurfaceView implements Runnable {
                     }
                 }
                 isSelecting = false;
+                break;
         }
         return true;
     }
