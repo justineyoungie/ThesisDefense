@@ -9,6 +9,8 @@ import android.util.Log;
 
 import com.thesis.thesisdefense.Activities.MapView;
 
+import static com.thesis.thesisdefense.Activities.MapView.TAG;
+
 /**
  * Anything that can shoot projectiles or inflict damage
  */
@@ -122,7 +124,7 @@ public abstract class Fighter extends Drawable {
         else if(isAttacking && currentFrame >= getImageWidth()) {
             readyToAttack = false; // attack has finished and needs to pause
             kill = true;
-            //toggleAttacking(); // is no longer attacking
+            isAttacking = false; // is no longer attacking
             setToStartingFrame(); // reset animation for idle animation
         }
 
@@ -151,14 +153,12 @@ public abstract class Fighter extends Drawable {
     public void pauseCountdown(){
         if(!isAttacking) {
             if(!readyToAttack) {
-                pauseCountdown --; // 1000 here is number of millis in a second (im just ganna assume its per tick)
+                pauseCountdown -= 1000 / FPS; // 1000 here is number of millis in a second (im just ganna assume its per tick)
                 if (pauseCountdown <= 0) {
                     pauseCountdown = attackPause;
                     readyToAttack = true;
                 }
             }
-            if(false) //if enemy is within range
-                isAttacking = true;
         }
     }
 
@@ -175,7 +175,9 @@ public abstract class Fighter extends Drawable {
         currentFrame = incrementX;
     }
 
+    /*
     public int takeDamage(int dmg){
+
         if(currentHealth -dmg <0){
             currentHealth = 0;
         }
@@ -184,5 +186,5 @@ public abstract class Fighter extends Drawable {
         }
         return currentHealth;
     }
-
+    */
 }

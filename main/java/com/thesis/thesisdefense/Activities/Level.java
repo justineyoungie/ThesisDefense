@@ -34,6 +34,7 @@ public class Level extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        mapView.resume();
     }
 
     // Make sure the thread in snakeView is stopped

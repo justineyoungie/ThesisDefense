@@ -12,7 +12,7 @@ public class Panelist extends Enemy{
     public static int FRAME_HEIGHT;
 
     public Panelist(int posX, int poxY, int indexY, Bitmap image, float scale) {
-        super(posX, poxY, 35, 1, 1000, indexY, image, scale, 6, 6, 5, 1);
+        super(posX, poxY, 10, 1, 1000, indexY, image, scale, 6, 6, 5, 1, 25);
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.getImageHeight();
 

@@ -178,9 +178,6 @@ public class MapView extends SurfaceView implements Runnable {
                 drawGame();
             }
         }
-        if(!m_Playing){
-            drawGame();
-        }
     }
 
     public void pause() {
@@ -207,7 +204,7 @@ public class MapView extends SurfaceView implements Runnable {
         }
 
         // Reset the m_Score
-        m_Score = 0;
+        m_Score = 150;
         allyMap[4][3] = new Warrior(map[4][3].x, map[4][3].y,
                 3, 4,
                 bitmapWarrior, scale);
@@ -219,8 +216,9 @@ public class MapView extends SurfaceView implements Runnable {
         // Setup m_NextFrameTime so an update is triggered immediately
         m_NextFrameTime = System.currentTimeMillis();
         summonEnemy(1);
-        summonEnemy(3);
         summonEnemy(4);
+
+        m_Playing = true;
 
     }
 
@@ -377,7 +375,7 @@ public class MapView extends SurfaceView implements Runnable {
                             Math.round(110*scale),
                             Math.round(50*scale));
 
-            if(isSelecting && selectedAlly.equals("Wizard")){
+            if(isSelecting && selectedAlly.equals("Wizard") || m_Score < 100){
                 m_Paint.setColorFilter(new LightingColorFilter(0xFF7F7F7F, 0x00000000));
                 m_Canvas.drawBitmap(bitmapWizardIcon, src, dst, m_Paint);
             }
@@ -394,7 +392,7 @@ public class MapView extends SurfaceView implements Runnable {
                             Math.round(200*scale),
                             Math.round(50*scale));
 
-            if(isSelecting && selectedAlly.equals("Warrior")){
+            if(isSelecting && selectedAlly.equals("Warrior") || m_Score < 50){
                 m_Paint.setColorFilter(new LightingColorFilter(0xFF7F7F7F, 0x00000000));
                 m_Canvas.drawBitmap(bitmapWarriorIcon, src, dst, m_Paint);
             }
@@ -453,6 +451,7 @@ public class MapView extends SurfaceView implements Runnable {
 
             // if paused, draw the pause screen
             if(!m_Playing) {
+                Log.e(TAG, "henlo why");
                 m_Paint.setARGB(60, 0,0,0);
                 m_Canvas.drawRect(0, 0, m_ScreenWidth, m_ScreenHeight, m_Paint);
 
@@ -496,7 +495,7 @@ public class MapView extends SurfaceView implements Runnable {
                 if(allyMap[y][x] != null){
                     Ally ally = allyMap[y][x];
                     ally.nextFrame();
-                    ally.updateAlly(enemies, m_BlockSize);
+                    m_Score += ally.updateAlly(enemies, m_BlockSize);
                 }
             }
         }
@@ -523,7 +522,8 @@ public class MapView extends SurfaceView implements Runnable {
                 else if(motionEvent.getX() >= Math.round(40 * scale) &&
                         motionEvent.getX() <= Math.round(120 * scale) &&
                         motionEvent.getY() >= Math.round(10 * scale) &&
-                        motionEvent.getY() <= Math.round(50 * scale)){ // ummm if you touch the wizard icon
+                        motionEvent.getY() <= Math.round(50 * scale) &&
+                        m_Score >= 100){ // ummm if you touch the wizard icon
                     isSelecting = true;
                     cursorLocation.x = (int) motionEvent.getX();
                     cursorLocation.y = (int) motionEvent.getY();
@@ -532,7 +532,8 @@ public class MapView extends SurfaceView implements Runnable {
                 else if(motionEvent.getX() >= Math.round(130 * scale) &&
                         motionEvent.getX() <= Math.round(200 * scale) &&
                         motionEvent.getY() >= Math.round(10 * scale) &&
-                        motionEvent.getY() <= Math.round(50 * scale)){ // pressed the warrior icon
+                        motionEvent.getY() <= Math.round(50 * scale) &&
+                        m_Score >= 50){ // pressed the warrior icon
                     isSelecting = true;
                     cursorLocation.x = (int) motionEvent.getX();
                     cursorLocation.y = (int) motionEvent.getY();
@@ -559,10 +560,14 @@ public class MapView extends SurfaceView implements Runnable {
                             motionEvent.getY() <= map[y][x].y + m_NumBlocksHigh && // if user released inside map
                             isSelecting && allyMap[y][x] == null){ // and no one's occupying the spot
                             // insert whoever's selected
-                            if(selectedAlly.equals("Wizard"))
+                            if(selectedAlly.equals("Wizard")) {
                                 allyMap[y][x] = new Wizard(map[y][x].x, map[y][x].y, x, y, bitmapWizard, scale);
-                            if(selectedAlly.equals("Warrior"))
+                                m_Score -= 100;
+                            }
+                            if(selectedAlly.equals("Warrior")) {
                                 allyMap[y][x] = new Warrior(map[y][x].x, map[y][x].y, x, y, bitmapWarrior, scale);
+                                m_Score -= 50;
+                            }
                         }
                     }
                 }
