@@ -528,7 +528,6 @@ public class MapView extends SurfaceView implements Runnable {
             for(int x = 0; x < allyMap[y].length; x++){
                 if(allyMap[y][x] != null){
                     Ally ally = allyMap[y][x];
-                    ally.nextFrame();
                     m_Score += ally.updateAlly(enemies, m_BlockSize);
                 }
             }

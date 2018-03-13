@@ -12,7 +12,7 @@ public class Panelist extends Enemy{
     public static int FRAME_HEIGHT;
 
     public Panelist(int posX, int poxY, int indexY, Bitmap image, float scale) {
-        super(posX, poxY, 10, 1, 1000, indexY, image, scale, 6, 6, 5, 1, 25);
+        super(posX, poxY, 10, 10, 1000, indexY, image, scale, 6, 6, 5, 1, 25);
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.getImageHeight();
 
@@ -22,6 +22,7 @@ public class Panelist extends Enemy{
     public void updateEnemy(Ally[][] allyMap, int m_BlockSize){
 
         //checks every ally in the Lane
+
         if(this.Rival == null) {
             for(int i = 0; i < allyMap[this.LaneY].length; i++){
                 Ally ally = allyMap[this.LaneY][i];
@@ -34,6 +35,24 @@ public class Panelist extends Enemy{
                 }
             }
             this.posX -= this.speed;
+        }
+        else{
+            if(Rival.currentHealth == 0){
+                Rival = null;
+            }
+            else {
+                if (!this.isAttacking && this.readyToAttack) {
+                    this.isAttacking = true;
+                }
+                if (this.kill) {
+                    boolean isDead = Rival.calculateDamage(this.damage); //get health after current dmg, idk wat to do with it xd it was handled by the loop
+                    kill = false;
+
+                    if(isDead){
+                        Rival = null;
+                    }
+                }
+            }
         }
         this.nextFrame();
     }

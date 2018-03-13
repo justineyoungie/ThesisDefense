@@ -31,6 +31,7 @@ public abstract class Ally extends Fighter{
 
     // returns 0 if no enemy was killed, returns the score of the enemy killed if otherwise
     public int updateAlly(ArrayList<Enemy> curEnemies, int m_BlockSize){
+        nextFrame();
         for(int i = 0; i < curEnemies.size(); i++){
             Enemy enemy = curEnemies.get(i);
             if(!enemies.contains(enemy) && enemy.LaneY == indexY && enemy.getCurrentHealth() != 0 &&
