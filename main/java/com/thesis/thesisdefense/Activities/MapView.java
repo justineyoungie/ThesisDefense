@@ -528,7 +528,12 @@ public class MapView extends SurfaceView implements Runnable {
             for(int x = 0; x < allyMap[y].length; x++){
                 if(allyMap[y][x] != null){
                     Ally ally = allyMap[y][x];
-                    m_Score += ally.updateAlly(enemies, m_BlockSize);
+                    if(ally.getCurrentHealth() <= 0){
+                        allyMap[y][x] = null;
+                    }
+                    else {
+                        m_Score += ally.updateAlly(enemies, m_BlockSize);
+                    }
                 }
             }
         }
@@ -674,7 +679,7 @@ public class MapView extends SurfaceView implements Runnable {
     }
 
     public void summonEnemy(int lane){ //Base index 0, until 4??
-        Enemy panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapPanelist,scale);
+        Enemy panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapWarrior,scale);
         enemies.add(panel);
     }
 }

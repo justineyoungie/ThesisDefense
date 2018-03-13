@@ -12,7 +12,7 @@ public class Panelist extends Enemy{
     public static int FRAME_HEIGHT;
 
     public Panelist(int posX, int poxY, int indexY, Bitmap image, float scale) {
-        super(posX, poxY, 10, 10, 1000, indexY, image, scale, 6, 6, 5, 1, 25);
+        super(posX, poxY, 7, 1, 1000, indexY, image, scale, 4, 10, 5, 1, 25);
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.getImageHeight();
 
@@ -47,7 +47,7 @@ public class Panelist extends Enemy{
                 if (this.kill) {
                     boolean isDead = Rival.calculateDamage(this.damage); //get health after current dmg, idk wat to do with it xd it was handled by the loop
                     kill = false;
-
+                    System.out.println("KIIIIIILLLL");
                     if(isDead){
                         Rival = null;
                     }
