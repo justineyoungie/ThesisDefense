@@ -25,6 +25,7 @@ import com.thesis.thesisdefense.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by justine on 3/5/18.
@@ -121,6 +122,10 @@ public class MapView extends SurfaceView implements Runnable {
 
     public ArrayList<Enemy> enemies;
     private MediaPlayer player;
+    private int[] enemyCount = new int[maxWave];
+    private ArrayList<Long>[] enemySpawnTime = new ArrayList[maxWave];
+    private int timePassedPerWave = 0;
+    private boolean winner = false;
 
 
     public MapView(Context context, Point size) {
@@ -187,12 +192,14 @@ public class MapView extends SurfaceView implements Runnable {
         } catch (InterruptedException e) {
             // Error
         }
+        drawGame();
     }
 
     public void resume() {
         m_Playing = true;
         m_Thread = new Thread(this);
         m_Thread.start();
+
     }
 
     public void startGame() {
@@ -213,10 +220,38 @@ public class MapView extends SurfaceView implements Runnable {
                 0, 1,
                 bitmapWizard, scale);
 
+        // initialize the spawn times
+        for(int i = 0; i < maxWave; i ++){
+            enemySpawnTime[i] = new ArrayList<Long>();
+        }
+
+        // for now, manually add each time to the arraylists
+        Random rand = new Random();
+        enemyCount[0] = rand.nextInt(5) + 1;
+        enemyCount[1] = rand.nextInt(5) + 1;
+        enemyCount[2] = rand.nextInt(8) + 1;
+        enemyCount[3] = rand.nextInt(10) + 1;
+        enemyCount[4] = rand.nextInt(15) + 1;
+
+
+        for(int i = 0; i < enemyCount.length; i++){
+            for(int y = 0; y < enemyCount[i]; y++){
+                if(y == 0 && i == 0){
+                    enemySpawnTime[i].add((long) 10000);
+                }
+                else if (i == 0){
+                    int time = rand.nextInt(100) + 1;
+                    enemySpawnTime[i].add((long) (time * 100 + 10000));
+                }
+                else{
+                    int time = rand.nextInt(100) + 1;
+                    enemySpawnTime[i].add((long) (time * 100));
+                }
+            }
+        }
+
         // Setup m_NextFrameTime so an update is triggered immediately
         m_NextFrameTime = System.currentTimeMillis();
-        summonEnemy(1);
-        summonEnemy(4);
 
         m_Playing = true;
 
@@ -357,7 +392,7 @@ public class MapView extends SurfaceView implements Runnable {
             m_Canvas.drawText("Coins: " + m_Score, (int) 500 * scale, (int)40 * scale, m_Paint);
 
 
-            m_Canvas.drawText("Wave: " + currentWave + "/" + maxWave, (int) 400 * scale, (int)40 * scale, m_Paint);
+            m_Canvas.drawText("Wave: " + (currentWave + 1) + "/" + maxWave, (int) 400 * scale, (int)40 * scale, m_Paint);
 
             //pause button
             Bitmap pause = BitmapFactory.decodeResource(this.getResources(), android.R.drawable.ic_media_pause);
@@ -434,8 +469,6 @@ public class MapView extends SurfaceView implements Runnable {
                                             map[y][x].y,
                                             map[y][x].x + m_BlockSize + 60,
                                             map[y][x].y + m_NumBlocksHigh);
-                            Log.e(TAG, "Coord: (" + map[y][x].x + ", " + map[y][x].y + ");" +
-                                    " Index: (" + y + ", " + x + ")");
                         }
                     }
                 }
@@ -480,6 +513,7 @@ public class MapView extends SurfaceView implements Runnable {
             // Setup when the next update will be triggered
             m_NextFrameTime =System.currentTimeMillis() + MILLIS_IN_A_SECOND / FPS;
 
+            timePassedPerWave += MILLIS_IN_A_SECOND / FPS;
             // Return true so that the update and draw
             // functions are executed
             return true;
@@ -502,12 +536,37 @@ public class MapView extends SurfaceView implements Runnable {
 
         for(int y = 0; y < enemies.size(); y++){
             Enemy enemy = enemies.get(y);
-            if(enemy.getCurrentHealth() == 0){
+            if(enemy.isDead()){
                 enemies.remove(enemy);
             }
             else {
                 enemy.updateEnemy(allyMap, m_BlockSize);
             }
+        }
+
+
+        for(int j = 0; j < enemySpawnTime[currentWave].size(); j++){
+            long spawn = enemySpawnTime[currentWave].get(j);
+            if(spawn <= timePassedPerWave){
+                Random rand = new Random();
+                this.summonEnemy(rand.nextInt(5));
+                enemySpawnTime[currentWave].remove((int) j);
+                if(currentWave == enemySpawnTime.length - 1) {
+                    winner = true;
+                }
+            }
+
+
+        }
+
+        if(enemySpawnTime[currentWave].size() == 0 && enemies.size() == 0 && currentWave < enemySpawnTime.length - 1) {
+            currentWave++;
+            timePassedPerWave = 0;
+        }
+
+        else if(currentWave == maxWave - 1 && enemies.size() == 0 && winner){
+            Log.e(TAG, "WINNER!");
+            //m_Playing = false;
         }
 
     }
@@ -516,7 +575,11 @@ public class MapView extends SurfaceView implements Runnable {
     public boolean onTouchEvent(MotionEvent motionEvent) {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
+                /*if(!m_Playing && winner){
+                    startGame();
+                }*/
                 if(!m_Playing){
+                    m_Playing = true;
                     resume();
                 }
                 else if(motionEvent.getX() >= Math.round(40 * scale) &&
@@ -545,6 +608,7 @@ public class MapView extends SurfaceView implements Runnable {
                         motionEvent.getY() >= Math.round(20 * scale) &&
                         motionEvent.getY() <= Math.round(50 * scale)){
                     pause();
+                    drawGame();
                 }
                 break;
             case MotionEvent.ACTION_MOVE:

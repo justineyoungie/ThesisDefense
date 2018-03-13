@@ -26,7 +26,9 @@ public class Panelist extends Enemy{
             for(int i = 0; i < allyMap[this.LaneY].length; i++){
                 Ally ally = allyMap[this.LaneY][i];
                 if(ally != null){
-                    if(this.posX <= ally.posX+m_BlockSize*range-30 && this.posX > ally.posX + 30 && this.Rival == null){ //add ally to enemys encounter if ally is in range
+                    if( this.posX <= ally.posX+m_BlockSize*range-30 && this.posX  + (m_BlockSize + 60) / 2 > ally.posX + 30 &&
+                        this.Rival == null){ //add ally to enemys encounter if ally is in range
+
                         this.Rival = ally;
                     }
                 }

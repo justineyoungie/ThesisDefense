@@ -33,12 +33,12 @@ public abstract class Ally extends Fighter{
     public int updateAlly(ArrayList<Enemy> curEnemies, int m_BlockSize){
         for(int i = 0; i < curEnemies.size(); i++){
             Enemy enemy = curEnemies.get(i);
-            if(!enemies.contains(enemy) && enemy.LaneY == indexY && enemy.getCurrentHealth() != 0 && enemy.getPosX() <= this.posX+m_BlockSize*range+30
-                    && enemy.getPosX() > this.posX +30){
+            if(!enemies.contains(enemy) && enemy.LaneY == indexY && enemy.getCurrentHealth() != 0 &&
+                    enemy.getPosX() <= this.posX+m_BlockSize*range+30 && enemy.getPosX() + (m_BlockSize + 60) / 2 > this.posX +30){
                 encounterEnemy(enemy);
             }
         }
-        while(enemies.size() != 0 && enemies.get(0).getCurrentHealth() == 0){
+        while(enemies.size() != 0 && enemies.get(0).isDead()){
             enemies.remove(0);
         }
         if (enemies.size() == 0) {

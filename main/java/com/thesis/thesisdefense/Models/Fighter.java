@@ -103,6 +103,10 @@ public abstract class Fighter extends Drawable {
         else if(!isAttacking && currentFrame >= idleFrame){
             idleBackwards = true; // go backward animation
         }
+        //if no longer attacking but in the middle of attack animation
+        else if(!isAttacking && currentFrame < idleFrame){
+            setToStartingFrame(); // reset animaiton
+        }
 
         // statements for attack animation
 
