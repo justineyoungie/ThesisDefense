@@ -5,9 +5,13 @@ package com.thesis.thesisdefense.Models;
  */
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.thesis.thesisdefense.Activities.MapView;
+import com.thesis.thesisdefense.R;
+
+import java.util.ArrayList;
 
 /**
  * Anything that can shoot projectiles or inflict damage
@@ -32,10 +36,12 @@ public abstract class Fighter extends Drawable {
     protected boolean isAttacking = false;
     protected boolean readyToAttack = true;
     protected double range;
-    protected boolean isWizard =false;
+
+    private Bitmap bitmapfire;
+    protected ArrayList<Attack> attacks;
 
     protected boolean kill = false; //Ready to damage the foe
-    public Fighter(int posX, int poxY, int maxHealth, int damage, Bitmap image, float scale, int idleFrame, int numberOfFrames, long attackPause, double range, boolean isWizard) {
+    public Fighter(int posX, int poxY, int maxHealth, int damage, Bitmap image, float scale, int idleFrame, int numberOfFrames, long attackPause, double range) {
         super(posX, poxY, image, scale);
         this.maxHealth = maxHealth;
         this.currentHealth = maxHealth;
@@ -46,7 +52,9 @@ public abstract class Fighter extends Drawable {
         this.attackPause = attackPause;
         this.pauseCountdown = attackPause;
         this.range = range;
-        this.isWizard=isWizard;
+        attacks = new ArrayList<>();
+
+        bitmapfire = BitmapFactory.decodeResource(this.getResources(), R.drawable.fire);
     }
 
     /**
@@ -150,6 +158,10 @@ public abstract class Fighter extends Drawable {
         return pauseCountdown;
     }
 
+    public ArrayList<Attack> getAttacks(){
+        return attacks;
+    }
+
     public void pauseCountdown(){
         if(!isAttacking) {
             if(!readyToAttack) {
@@ -159,18 +171,19 @@ public abstract class Fighter extends Drawable {
                     readyToAttack = true;
                 }
             }
-            if(false) //if enemy is within range
+            if(false) {//if enemy is within range
                 isAttacking = true;
+                if (this instanceof Wizard)
+                {
+                    Attack a = new Attack(posX,posY,bitmap)
+                }
+            }
         }
     }
 
 
     public boolean isAttacking(){
         return isAttacking;
-    }
-
-    public boolean isWizard(){
-        return isWizard;
     }
 
     public void toggleAttacking(){

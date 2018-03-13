@@ -14,6 +14,7 @@ public abstract class Ally extends Fighter{
     protected int indexY;
 
     protected ArrayList<Enemy> enemies;
+
     /*
         maxHealth, damage, attackPause are hardcoded in constructors of child classes and is dependent on class
         idleFrame, numberOfFrames are hardcoded in constructors but highly dependent on asset design
@@ -21,8 +22,8 @@ public abstract class Ally extends Fighter{
 
     public Ally(int posX, int poxY, int maxHealth, int damage, long attackPause,
                 int indexX, int indexY, Bitmap image, float scale, int idleFrame,
-                int numberOfFrames, double range, boolean isWizard) {
-        super(posX, poxY, maxHealth, damage, image, scale, idleFrame, numberOfFrames, attackPause, range, isWizard);
+                int numberOfFrames, double range) {
+        super(posX, poxY, maxHealth, damage, image, scale, idleFrame, numberOfFrames, attackPause, range);
         this.indexX = indexX;
         this.indexY = indexY;
         enemies = new ArrayList<>();

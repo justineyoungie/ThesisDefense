@@ -427,11 +427,7 @@ public class MapView extends SurfaceView implements Runnable {
                     Ally ally = allyMap[y][x];
                     ally.nextFrame();
                     ally.updateAlly();
-                    if(ally instanceof Wizard) {
-                      /*  Drawable fire = new Attack(enemy.getPosX(), enemy.getPosY(), bitmapfire, scale);
-                        m_Canvas.drawBitmap(fire.getImage(), enemy.getPosX(), enemy.getPosY(), m_Paint);
-                        */
-                    }
+                    ally.getAttacks().encounterEnemy(enemies);
                 }
             }
         }
@@ -530,7 +526,7 @@ public class MapView extends SurfaceView implements Runnable {
     }
 
     public void summonEnemy(int lane){ //Base index 0, until 4??
-        Enemy panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapPanelist,scale, false);
+        Enemy panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapPanelist,scale);
         enemies.add(panel);
     }
 }
