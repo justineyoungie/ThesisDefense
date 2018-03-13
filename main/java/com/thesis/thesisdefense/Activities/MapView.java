@@ -31,7 +31,7 @@ import java.util.ArrayList;
 
 public class MapView extends SurfaceView implements Runnable {
 
-    public static final String TAG = "Thesis Defense";
+    public static final String TAG = "Thesis Defense"; //yes
 
     // All the code will run separately to the UI
     private Thread m_Thread = null;
