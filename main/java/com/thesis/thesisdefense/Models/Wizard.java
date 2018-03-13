@@ -12,7 +12,7 @@ public class Wizard extends Ally{
     public static int FRAME_HEIGHT;
 
     public Wizard(int posX, int poxY, int indexX, int indexY, Bitmap image, float scale) {
-        super(posX, poxY, 5, 1, 1000, indexX, indexY, image, scale, 3, 7, 3);
+        super(posX, poxY, 5, 1, 1000, indexX, indexY, image, scale, 4, 8, 3);
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.getImageHeight();
 

@@ -38,4 +38,8 @@ public abstract class Enemy extends Fighter{
     public int getScore(){
         return score;
     }
+
+    public int getLane(){
+        return LaneY;
+    }
 }

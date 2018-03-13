@@ -121,8 +121,10 @@ public abstract class Fighter extends Drawable {
         }
 
         // if attacking and current frame not yet reached end of image (end of attacking frames)
-        else if(isAttacking && currentFrame < getImageWidth())
+        else if(isAttacking && currentFrame < getImageWidth()) {
+            Log.e(TAG, "Current Frame: " + currentFrame + ", Width: " + getImageWidth());
             currentFrame += incrementX; // next frame
+        }
 
         // if attacking and current frame exceeds image width (more than end of attacking frames)
         else if(isAttacking && currentFrame >= getImageWidth()) {
@@ -131,6 +133,7 @@ public abstract class Fighter extends Drawable {
             isAttacking = false; // is no longer attacking
             setToStartingFrame(); // reset animation for idle animation
         }
+
 
         pauseCountdown(); // if not attacking, timer for attack pause is triggered
 
