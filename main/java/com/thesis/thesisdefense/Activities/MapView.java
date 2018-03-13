@@ -129,6 +129,7 @@ public class MapView extends SurfaceView implements Runnable {
     private int timePassedPerWave = 0;
     private boolean winner = false;
     private boolean gameOver = false;
+    private boolean winCon = false;
 
 
     public MapView(Context context, Point size) {
@@ -153,10 +154,10 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapBackground = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
 
         // wizard
-        bitmapWizard = decodeSampleBitmapFromResource(this.getResources(), R.drawable.wizard, 200, 200);
+        bitmapWizard = decodeSampleBitmapFromResource(this.getResources(), R.drawable.wizard, 150, 150);
         bitmapWizardIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard_icon);
 
-        bitmapWarrior = decodeSampleBitmapFromResource(this.getResources(), R.drawable.warrior, 200, 200);
+        bitmapWarrior = decodeSampleBitmapFromResource(this.getResources(), R.drawable.warrior, 150, 150);
         bitmapWarriorIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.warrior_icon);
 
         bitmapPanelist = BitmapFactory.decodeResource(this.getResources(), R.drawable.panelist);
@@ -166,7 +167,7 @@ public class MapView extends SurfaceView implements Runnable {
         map = new Point[5][8];
 
         enemies = new ArrayList<>();
-        bitmapCastle = decodeSampleBitmapFromResource(this.getResources(), R.drawable.castle, 300, m_ScreenHeight);
+        bitmapCastle = decodeSampleBitmapFromResource(this.getResources(), R.drawable.castle, 150, m_ScreenHeight / 2);
         bitmapThesis = BitmapFactory.decodeResource(this.getResources(), R.drawable.thesis);
 
 
@@ -561,7 +562,6 @@ public class MapView extends SurfaceView implements Runnable {
     }
 
     public void updateGame() {
-
         for(int y = 0; y < allyMap.length; y++){
             for(int x = 0; x < allyMap[y].length; x++){
                 if(allyMap[y][x] != null){
@@ -590,7 +590,7 @@ public class MapView extends SurfaceView implements Runnable {
                 this.summonEnemy(rand.nextInt(5));
                 enemySpawnTime[currentWave].remove((int) j);
                 if(currentWave == enemySpawnTime.length - 1) {
-                    winner = true;
+                    winCon = true;
                 }
             }
         }
@@ -609,8 +609,9 @@ public class MapView extends SurfaceView implements Runnable {
             timePassedPerWave = 0;
         }
 
-        else if(currentWave == maxWave - 1 && enemies.size() == 0 && winner){
+        else if(currentWave == maxWave - 1 && enemies.size() == 0 && winCon){
             Log.e(TAG, "WINNER!");
+            winner = true;
             //m_Playing = false;
         }
 
