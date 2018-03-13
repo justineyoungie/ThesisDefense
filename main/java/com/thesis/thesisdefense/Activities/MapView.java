@@ -1,6 +1,7 @@
 package com.thesis.thesisdefense.Activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
@@ -95,6 +96,7 @@ public class MapView extends SurfaceView implements Runnable {
     private Bitmap bitmapPanelist;
     private Bitmap bitmapThesis;
     private Bitmap bitmapCastle;
+    private Bitmap bitmapVictory;
 
     /*
         For drawing allies to the map
@@ -110,7 +112,7 @@ public class MapView extends SurfaceView implements Runnable {
     /*
         not yet implemented but needed
      */
-    private Ally[][] allyMap = new Ally[5][8];
+    private Ally[][] allyMap;
 
 
     float scale = getResources().getDisplayMetrics().density;
@@ -122,10 +124,12 @@ public class MapView extends SurfaceView implements Runnable {
 
     public ArrayList<Enemy> enemies;
     private MediaPlayer player;
-    private int[] enemyCount = new int[maxWave];
-    private ArrayList<Long>[] enemySpawnTime = new ArrayList[maxWave];
+    private int[] enemyCount;
+    private ArrayList<Long>[] enemySpawnTime;
     private int timePassedPerWave = 0;
     private boolean winner = false;
+    private boolean gameOver = false;
+    private boolean winCon = false;
 
 
     public MapView(Context context, Point size) {
@@ -150,18 +154,20 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapBackground = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
 
         // wizard
-        bitmapWizard = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard);
+        bitmapWizard = decodeSampleBitmapFromResource(this.getResources(), R.drawable.wizard, 150, 150);
         bitmapWizardIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard_icon);
 
-        bitmapWarrior = decodeSampleBitmapFromResource(this.getResources(), R.drawable.warrior, 200, 200);
+        bitmapWarrior = decodeSampleBitmapFromResource(this.getResources(), R.drawable.warrior, 150, 150);
         bitmapWarriorIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.warrior_icon);
 
         bitmapPanelist = BitmapFactory.decodeResource(this.getResources(), R.drawable.panelist);
 
+        bitmapVictory = BitmapFactory.decodeResource(this.getResources(), R.drawable.victory);
+
         map = new Point[5][8];
 
         enemies = new ArrayList<>();
-        bitmapCastle = decodeSampleBitmapFromResource(this.getResources(), R.drawable.castle, 300, m_ScreenHeight);
+        bitmapCastle = decodeSampleBitmapFromResource(this.getResources(), R.drawable.castle, 150, m_ScreenHeight / 2);
         bitmapThesis = BitmapFactory.decodeResource(this.getResources(), R.drawable.thesis);
 
 
@@ -203,6 +209,16 @@ public class MapView extends SurfaceView implements Runnable {
     }
 
     public void startGame() {
+
+        // reset everything
+        currentWave = 0;
+        allyMap = new Ally[5][8];
+        enemyCount = new int[maxWave];
+        enemySpawnTime = new ArrayList[maxWave];
+        timePassedPerWave = 0;
+        gameOver = false;
+        winner = false;
+
         // Load the points of each tile
         for(int y = 0; y < map.length; y++){
             for(int x = 0; x < map[y].length; x++){
@@ -252,8 +268,6 @@ public class MapView extends SurfaceView implements Runnable {
 
         // Setup m_NextFrameTime so an update is triggered immediately
         m_NextFrameTime = System.currentTimeMillis();
-
-        m_Playing = true;
 
     }
 
@@ -348,6 +362,8 @@ public class MapView extends SurfaceView implements Runnable {
             Rect src;
             Rect dst;
 
+            //draw the thesis papers
+
             src = new Rect(0, 0, bitmapThesis.getWidth(), bitmapThesis.getHeight());
             for(int i = 0; i < map.length; i++){
                 dst = new Rect( map[i][0].x - m_BlockSize + m_BlockSize / 4, map[i][0].y + m_NumBlocksHigh / 4,
@@ -355,6 +371,7 @@ public class MapView extends SurfaceView implements Runnable {
                 m_Canvas.drawBitmap(bitmapThesis, src, dst, m_Paint);
             }
 
+            // draw castle on the side
             src = new Rect(0, 0, bitmapCastle.getWidth(), bitmapCastle.getHeight());
             dst = new Rect((int)(-120 * scale), (int)(-80 * scale), (int) (120 * scale), m_ScreenHeight);
             m_Canvas.drawBitmap(bitmapCastle, src, dst, m_Paint);
@@ -482,9 +499,32 @@ public class MapView extends SurfaceView implements Runnable {
             }
 
 
+            if(winner){
+                m_Paint.setARGB(60, 0,0,0);
+                m_Canvas.drawRect(0, 0, m_ScreenWidth, m_ScreenHeight, m_Paint);
+
+                m_Paint.setColor(Color.WHITE);
+                m_Paint.setTextAlign(Paint.Align.CENTER);
+                m_Paint.setTextSize(32 * scale);
+                m_Canvas.drawText("YOU DEFENDED THESIS!", m_ScreenWidth / 2, m_ScreenHeight / 2 - 50, m_Paint);
+
+                m_Paint.setTextSize(20 * scale);
+                m_Canvas.drawText("(Click anywhere to restart level)", m_ScreenWidth / 2, m_ScreenHeight / 2, m_Paint);
+            }
+            else if(gameOver){
+                m_Paint.setARGB(60, 0,0,0);
+                m_Canvas.drawRect(0, 0, m_ScreenWidth, m_ScreenHeight, m_Paint);
+
+                m_Paint.setColor(Color.WHITE);
+                m_Paint.setTextAlign(Paint.Align.CENTER);
+                m_Paint.setTextSize(32 * scale);
+                m_Canvas.drawText("FAILED TO DEFEND YOUR THESIS!", m_ScreenWidth / 2, m_ScreenHeight / 2 - 50, m_Paint);
+
+                m_Paint.setTextSize(20 * scale);
+                m_Canvas.drawText("(Click anywhere to restart level)", m_ScreenWidth / 2, m_ScreenHeight / 2, m_Paint);
+            }
             // if paused, draw the pause screen
-            if(!m_Playing) {
-                Log.e(TAG, "henlo why");
+            else if(!m_Playing) {
                 m_Paint.setARGB(60, 0,0,0);
                 m_Canvas.drawRect(0, 0, m_ScreenWidth, m_ScreenHeight, m_Paint);
 
@@ -497,7 +537,6 @@ public class MapView extends SurfaceView implements Runnable {
                 m_Paint.setTextSize(20 * scale);
                 m_Canvas.drawText("(Click anywhere to continue)", m_ScreenWidth / 2, m_ScreenHeight / 2, m_Paint);
             }
-
 
             // Draw the whole frame
             m_Holder.unlockCanvasAndPost(m_Canvas);
@@ -523,7 +562,6 @@ public class MapView extends SurfaceView implements Runnable {
     }
 
     public void updateGame() {
-
         for(int y = 0; y < allyMap.length; y++){
             for(int x = 0; x < allyMap[y].length; x++){
                 if(allyMap[y][x] != null){
@@ -556,20 +594,28 @@ public class MapView extends SurfaceView implements Runnable {
                 this.summonEnemy(rand.nextInt(5));
                 enemySpawnTime[currentWave].remove((int) j);
                 if(currentWave == enemySpawnTime.length - 1) {
-                    winner = true;
+                    winCon = true;
                 }
             }
-
-
         }
 
+        for(int i = 0; i < enemies.size(); i ++){
+            Enemy enemy = enemies.get(i);
+            if(enemy.getPosX() <= map[enemy.getLane()][0].x - m_BlockSize + m_BlockSize / 2){
+                gameOver = true;
+                m_Playing = false;
+                drawGame();
+                break;
+            }
+        }
         if(enemySpawnTime[currentWave].size() == 0 && enemies.size() == 0 && currentWave < enemySpawnTime.length - 1) {
             currentWave++;
             timePassedPerWave = 0;
         }
 
-        else if(currentWave == maxWave - 1 && enemies.size() == 0 && winner){
+        else if(currentWave == maxWave - 1 && enemies.size() == 0 && winCon){
             Log.e(TAG, "WINNER!");
+            winner = true;
             //m_Playing = false;
         }
 
@@ -579,10 +625,15 @@ public class MapView extends SurfaceView implements Runnable {
     public boolean onTouchEvent(MotionEvent motionEvent) {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                /*if(!m_Playing && winner){
-                    startGame();
-                }*/
-                if(!m_Playing){
+                if(winner){
+                    Intent intent = new Intent(this.getContext(), Level.class);
+                    this.getContext().startActivity(intent);
+                }
+                else if(gameOver){
+                    Intent intent = new Intent(this.getContext(), Level.class);
+                    this.getContext().startActivity(intent);
+                }
+                else if(!m_Playing){
                     m_Playing = true;
                     resume();
                 }
