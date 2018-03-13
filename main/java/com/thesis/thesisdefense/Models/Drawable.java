@@ -11,7 +11,7 @@ import android.graphics.Bitmap;
  * Literally anything drawable in the Canvas
  */
 
-public abstract class Drawable extends Object {
+public abstract class   Drawable extends Object {
     protected int posX;
     protected int posY;
     protected int sizeX;

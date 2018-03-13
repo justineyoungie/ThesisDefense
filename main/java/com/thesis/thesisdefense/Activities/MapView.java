@@ -23,6 +23,7 @@ import com.thesis.thesisdefense.Models.*;
 import com.thesis.thesisdefense.R;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by justine on 3/5/18.
@@ -91,7 +92,7 @@ public class MapView extends SurfaceView implements Runnable {
     private Bitmap bitmapWizardTransparent;
     private Bitmap bitmapWarrior;
     private Bitmap bitmapWarriorIcon;
-
+    private Bitmap bitmapPanelist;
     /*
         For drawing allies to the map
      */
@@ -116,7 +117,7 @@ public class MapView extends SurfaceView implements Runnable {
     private int m_BlockSize;
     private int m_NumBlocksHigh; // determined dynamically
 
-
+    public ArrayList<Enemy> enemies;
 
     public MapView(Context context, Point size) {
         super(context);
@@ -148,8 +149,11 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapWarrior = decodeSampleBitmapFromResource(this.getResources(), R.drawable.warrior, 200, 200);
         bitmapWarriorIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.warrior_icon);
 
+        bitmapPanelist = BitmapFactory.decodeResource(this.getResources(), R.drawable.panelist);
+
         map = new Point[5][8];
 
+        enemies = new ArrayList<>();
         // Start the game
         startGame();
 
@@ -200,11 +204,15 @@ public class MapView extends SurfaceView implements Runnable {
                 bitmapWarrior, scale);
 
         allyMap[1][0] = new Wizard(map[1][0].x, map[1][0].y,
-                1, 0,
+                0, 1,
                 bitmapWizard, scale);
 
         // Setup m_NextFrameTime so an update is triggered immediately
         m_NextFrameTime = System.currentTimeMillis();
+        summonEnemy(1);
+        summonEnemy(3);
+        summonEnemy(4);
+
     }
 
     public void loadSound() {
@@ -276,6 +284,16 @@ public class MapView extends SurfaceView implements Runnable {
                 }
             }
 
+
+            //Draw enemies
+            for(int y = 0; y < enemies.size(); y++){
+                Enemy enemy = enemies.get(y);
+                src = new Rect((enemy.getCurrentFrame() - enemy.getIncrementX()), 0, enemy.getCurrentFrame(), enemy.getImageHeight());
+                dst = new Rect(enemy.getPosX(), enemy.getPosY(),
+                               enemy.getPosX()+m_BlockSize+60,
+                               enemy.getPosY()+m_NumBlocksHigh);
+                m_Canvas.drawBitmap(enemy.getImage(), src, dst, m_Paint);
+            }
 
 
             // Choose how big the score will be
@@ -404,7 +422,18 @@ public class MapView extends SurfaceView implements Runnable {
                 if(allyMap[y][x] != null){
                     Ally ally = allyMap[y][x];
                     ally.nextFrame();
+                    ally.updateAlly(enemies, m_BlockSize);
                 }
+            }
+        }
+
+        for(int y = 0; y < enemies.size(); y++){
+            Enemy enemy = enemies.get(y);
+            if(enemy.getCurrentHealth() == 0){
+                enemies.remove(enemy);
+            }
+            else {
+                enemy.updateEnemy(allyMap, m_BlockSize);
             }
         }
 
@@ -488,5 +517,10 @@ public class MapView extends SurfaceView implements Runnable {
         }
 
         return inSampleSize;
+    }
+
+    public void summonEnemy(int lane){ //Base index 0, until 4??
+        Enemy panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapPanelist,scale);
+        enemies.add(panel);
     }
 }
