@@ -150,7 +150,7 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapBackground = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
 
         // wizard
-        bitmapWizard = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard);
+        bitmapWizard = decodeSampleBitmapFromResource(this.getResources(), R.drawable.wizard, 200, 200);
         bitmapWizardIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.wizard_icon);
 
         bitmapWarrior = decodeSampleBitmapFromResource(this.getResources(), R.drawable.warrior, 200, 200);
