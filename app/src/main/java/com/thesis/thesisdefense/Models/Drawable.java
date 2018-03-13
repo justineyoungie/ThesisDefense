@@ -5,7 +5,7 @@ package com.thesis.thesisdefense.Models;
  */
 
 
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Bitmap;
 
 /**
  * Literally anything drawable in the Canvas
@@ -16,13 +16,13 @@ public abstract class Drawable extends Object {
     protected int posY;
     protected int sizeX;
     protected int sizeY;
-    protected BitmapDrawable image;
+    protected Bitmap image;
 
-    public Drawable(int posX, int posY, int sizeX, int sizeY, BitmapDrawable image) {
+    public Drawable(int posX, int posY, Bitmap image, float scale) {
         this.posX = posX;
         this.posY = posY;
-        this.sizeX = sizeX;
-        this.sizeY = sizeY;
+        this.sizeX = (int) (image.getWidth() * scale);
+        this.sizeY = (int) (image.getHeight() * scale);
         this.image = image;
     }
 
@@ -30,31 +30,22 @@ public abstract class Drawable extends Object {
         return posX;
     }
 
-    public void setPosX(int posX) {
-        this.posX = posX;
-    }
-
     public int getPosY() {
         return posY;
     }
 
-    public void setPoxY(int poxY) {
-        this.posY = poxY;
-    }
-
-    public int getSizeX() {
+    public int getScaledWidth() {
         return sizeX;
     }
 
-    public void setSizeX(int sizeX) {
-        this.sizeX = sizeX;
-    }
-
-    public int getSizeY() {
+    public int getScaledHeight() {
         return sizeY;
     }
 
-    public void setSizeY(int sizeY) {
-        this.sizeY = sizeY;
-    }
+    public int getImageWidth() { return image.getWidth(); }
+
+    public int getImageHeight() { return image.getHeight(); }
+
+    public Bitmap getImage() { return image; }
+
 }
