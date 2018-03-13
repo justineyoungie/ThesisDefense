@@ -427,7 +427,7 @@ public class MapView extends SurfaceView implements Runnable {
                     Ally ally = allyMap[y][x];
                     ally.nextFrame();
                     ally.updateAlly();
-                    ally.getAttacks().encounterEnemy(enemies);
+                   // ally.getAttacks().encounterEnemy(enemies);
                 }
             }
         }

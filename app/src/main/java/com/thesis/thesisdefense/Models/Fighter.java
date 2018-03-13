@@ -36,8 +36,6 @@ public abstract class Fighter extends Drawable {
     protected boolean isAttacking = false;
     protected boolean readyToAttack = true;
     protected double range;
-
-    private Bitmap bitmapfire;
     protected ArrayList<Attack> attacks;
 
     protected boolean kill = false; //Ready to damage the foe
@@ -54,7 +52,6 @@ public abstract class Fighter extends Drawable {
         this.range = range;
         attacks = new ArrayList<>();
 
-        bitmapfire = BitmapFactory.decodeResource(this.getResources(), R.drawable.fire);
     }
 
     /**
