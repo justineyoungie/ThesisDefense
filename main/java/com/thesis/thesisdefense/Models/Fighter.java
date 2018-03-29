@@ -9,12 +9,14 @@ import android.util.Log;
 
 import com.thesis.thesisdefense.Activities.MapView;
 
+import static com.thesis.thesisdefense.Activities.MapView.TAG;
+
 /**
  * Anything that can shoot projectiles or inflict damage
  */
 
 public abstract class Fighter extends Drawable {
-    private long FPS = 10;
+    protected long FPS = 10;
 
     protected int maxHealth;
     protected int currentHealth;
@@ -31,8 +33,10 @@ public abstract class Fighter extends Drawable {
     protected long pauseCountdown;
     protected boolean isAttacking = false;
     protected boolean readyToAttack = true;
+    protected double range;
 
-    public Fighter(int posX, int poxY, int maxHealth, int damage, Bitmap image, float scale, int idleFrame, int numberOfFrames, long attackPause) {
+    protected boolean kill = false; //Ready to damage the foe
+    public Fighter(int posX, int poxY, int maxHealth, int damage, Bitmap image, float scale, int idleFrame, int numberOfFrames, long attackPause, double range) {
         super(posX, poxY, image, scale);
         this.maxHealth = maxHealth;
         this.currentHealth = maxHealth;
@@ -42,6 +46,7 @@ public abstract class Fighter extends Drawable {
         this.idleFrame = idleFrame * incrementX;
         this.attackPause = attackPause;
         this.pauseCountdown = attackPause;
+        this.range = range;
     }
 
     /**
@@ -98,6 +103,10 @@ public abstract class Fighter extends Drawable {
         else if(!isAttacking && currentFrame >= idleFrame){
             idleBackwards = true; // go backward animation
         }
+        //if no longer attacking but in the middle of attack animation
+        else if(!isAttacking && currentFrame < idleFrame){
+            setToStartingFrame(); // reset animaiton
+        }
 
         // statements for attack animation
 
@@ -112,15 +121,19 @@ public abstract class Fighter extends Drawable {
         }
 
         // if attacking and current frame not yet reached end of image (end of attacking frames)
-        else if(isAttacking && currentFrame < getImageWidth())
+        else if(isAttacking && currentFrame < getImageWidth()) {
+            Log.e(TAG, "Current Frame: " + currentFrame + ", Width: " + getImageWidth());
             currentFrame += incrementX; // next frame
+        }
 
         // if attacking and current frame exceeds image width (more than end of attacking frames)
         else if(isAttacking && currentFrame >= getImageWidth()) {
             readyToAttack = false; // attack has finished and needs to pause
-            toggleAttacking(); // is no longer attacking
+            kill = true;
+            isAttacking = false; // is no longer attacking
             setToStartingFrame(); // reset animation for idle animation
         }
+
 
         pauseCountdown(); // if not attacking, timer for attack pause is triggered
 
@@ -147,14 +160,12 @@ public abstract class Fighter extends Drawable {
     public void pauseCountdown(){
         if(!isAttacking) {
             if(!readyToAttack) {
-                pauseCountdown -= 1000 / FPS; // 1000 here is number of millis in a second
+                pauseCountdown -= 1000 / FPS; // 1000 here is number of millis in a second (im just ganna assume its per tick)
                 if (pauseCountdown <= 0) {
                     pauseCountdown = attackPause;
                     readyToAttack = true;
                 }
             }
-            if(false) //if enemy is within range
-                isAttacking = true;
         }
     }
 
@@ -171,4 +182,16 @@ public abstract class Fighter extends Drawable {
         currentFrame = incrementX;
     }
 
+    /*
+    public int takeDamage(int dmg){
+
+        if(currentHealth -dmg <0){
+            currentHealth = 0;
+        }
+        else{
+            currentHealth -= dmg;
+        }
+        return currentHealth;
+    }
+    */
 }
