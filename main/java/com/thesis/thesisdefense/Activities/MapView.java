@@ -96,7 +96,7 @@ public class MapView extends SurfaceView implements Runnable {
     private Bitmap bitmapPanelist;
     private Bitmap bitmapThesis;
     private Bitmap bitmapCastle;
-    private Bitmap bitmapVictory;
+    private Bitmap bitmapEnemy;
 
     /*
         For drawing allies to the map
@@ -160,9 +160,7 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapWarrior = decodeSampleBitmapFromResource(this.getResources(), R.drawable.warrior, 150, 150);
         bitmapWarriorIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.warrior_icon);
 
-        bitmapPanelist = BitmapFactory.decodeResource(this.getResources(), R.drawable.panelist);
-
-        bitmapVictory = BitmapFactory.decodeResource(this.getResources(), R.drawable.victory);
+        bitmapEnemy = decodeSampleBitmapFromResource(this.getResources(), R.drawable.warrior_flipped, 150, 150);
 
         map = new Point[5][8];
 
@@ -626,10 +624,12 @@ public class MapView extends SurfaceView implements Runnable {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 if(winner){
+                    this.destroy();
                     Intent intent = new Intent(this.getContext(), Level.class);
                     this.getContext().startActivity(intent);
                 }
                 else if(gameOver){
+                    this.destroy();
                     Intent intent = new Intent(this.getContext(), Level.class);
                     this.getContext().startActivity(intent);
                 }
@@ -730,7 +730,19 @@ public class MapView extends SurfaceView implements Runnable {
     }
 
     public void summonEnemy(int lane){ //Base index 0, until 4??
-        Enemy panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapWarrior,scale);
+        Enemy panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapEnemy,scale);
         enemies.add(panel);
+    }
+
+
+    public void destroy(){
+        bitmapWizard.recycle();
+        bitmapBackground.recycle();
+        bitmapWizardIcon.recycle();
+        bitmapWarrior.recycle();
+        bitmapWarriorIcon.recycle();
+        bitmapThesis.recycle();
+        bitmapCastle.recycle();
+        bitmapEnemy.recycle();
     }
 }

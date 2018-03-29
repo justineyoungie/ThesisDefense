@@ -45,4 +45,10 @@ public class Level extends AppCompatActivity {
         mapView.pause();
     }
 
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        mapView.destroy();
+    }
+
 }
