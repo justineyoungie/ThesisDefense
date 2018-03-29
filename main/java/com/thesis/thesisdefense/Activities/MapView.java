@@ -93,11 +93,10 @@ public class MapView extends SurfaceView implements Runnable {
     private Bitmap bitmapWizardIcon;
     private Bitmap bitmapWarrior;
     private Bitmap bitmapWarriorIcon;
+    private Bitmap bitmapPanelist;
     private Bitmap bitmapThesis;
     private Bitmap bitmapCastle;
     private Bitmap bitmapEnemy;
-    private Bitmap bitmapVictory;
-    private Bitmap bitmapPanelist;
 
     /*
         For drawing allies to the map
