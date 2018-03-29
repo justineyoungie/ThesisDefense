@@ -160,8 +160,6 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapWarrior = decodeSampleBitmapFromResource(this.getResources(), R.drawable.warrior, 150, 150);
         bitmapWarriorIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.warrior_icon);
 
-        bitmapVictory = BitmapFactory.decodeResource(this.getResources(), R.drawable.victory);
-
         bitmapEnemy = decodeSampleBitmapFromResource(this.getResources(), R.drawable.warrior_flipped, 150, 150);
 
         map = new Point[5][8];
