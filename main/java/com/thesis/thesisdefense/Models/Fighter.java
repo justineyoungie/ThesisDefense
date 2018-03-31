@@ -5,6 +5,7 @@ package com.thesis.thesisdefense.Models;
  */
 
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.util.Log;
 
 import com.thesis.thesisdefense.Activities.MapView;
@@ -24,26 +25,34 @@ public abstract class Fighter extends Drawable {
     protected boolean isDead = false;
 
     protected int incrementX; //number of pixels in src image for next frame
-    protected int idleFrame; //number of pixels that specify until what frame is the idle animation
-    protected boolean idleBackwards = false; // idle animations are done in loops of forward then backward; a checker for the animation
+    protected int incrementY; // number of pixels in src image for action toggle
+    protected int idleFrameEnd; // pixel showing end of idle frames
+    protected int attackFrameEnd; // pixel showing end of attack frames
+    protected boolean attackBackwards = false; // idle animations are done in loops of forward then backward; a checker for the animation
 
-    protected int currentFrame;
+    protected Point currentFrame;
 
     protected long attackPause;
     protected long pauseCountdown;
     protected boolean isAttacking = false;
     protected boolean readyToAttack = true;
     protected double range;
+    protected int damageFrame = 0;
 
     protected boolean kill = false; //Ready to damage the foe
-    public Fighter(int posX, int poxY, int maxHealth, int damage, Bitmap image, float scale, int idleFrame, int numberOfFrames, long attackPause, double range) {
+    public Fighter(int posX, int poxY, int maxHealth, int damage, int incrementX, int incrementY,
+                   Bitmap image, float scale, int idleFrames, int attackFrames, long attackPause, double range) {
         super(posX, poxY, image, scale);
         this.maxHealth = maxHealth;
         this.currentHealth = maxHealth;
         this.damage = damage;
-        this.incrementX = image.getWidth() / numberOfFrames;
-        this.currentFrame = incrementX;
-        this.idleFrame = idleFrame * incrementX;
+        this.incrementX = incrementX;
+        this.incrementY = incrementY;
+        this.currentFrame = new Point(incrementX, incrementY);
+
+        this.idleFrameEnd = image.getWidth() - (8 - idleFrames) * incrementX;
+        this.attackFrameEnd = image.getWidth() - (8 - attackFrames) * incrementX;
+
         this.attackPause = attackPause;
         this.pauseCountdown = attackPause;
         this.range = range;
@@ -61,6 +70,7 @@ public abstract class Fighter extends Drawable {
         if (currentHealth <= 0) {
             isDead = true;
         }
+        damageFrame = 2;
         return isDead;
     }
 
@@ -80,71 +90,72 @@ public abstract class Fighter extends Drawable {
         this.damage = damage;
     }
 
+    public boolean isBeingDamaged(){ return damageFrame > 0; }
+
     public boolean isDead() {
         return isDead;
     }
 
     public void nextFrame() {
 
-        // 4 statements for idle animation
+        // 2 statements for idle animation
 
-        // if idle and not yet reached end of idle frames and forward animation
-        if(!isAttacking && currentFrame < idleFrame && !idleBackwards)
-            currentFrame += incrementX; // next frame
-        // if idle and backward animation and not yet reached first idle frame
-        else if(!isAttacking && idleBackwards && currentFrame > incrementX){
-            currentFrame -= incrementX; // previous frame
+        // if not attacking and not yet reached end of idle frames and is not in attacking frames
+        if (!isAttacking && currentFrame.x < idleFrameEnd && currentFrame.y <= incrementY){
+            currentFrame.x += incrementX;
         }
-        // if idle and backward animation and reached the first frame of idle animation
-        else if(!isAttacking && idleBackwards && currentFrame <= incrementX) {
-            idleBackwards = false; // go forward animation
+        // if not attacking and exceeded idle frames OR if not attacking and is in attacking frames
+        else if(!isAttacking && currentFrame.x >= idleFrameEnd && !attackBackwards || !isAttacking && currentFrame.y > incrementY && !attackBackwards){
+            setToStartingFrame(); // reset to first idle frame
         }
 
-        else if(!isAttacking && currentFrame >= idleFrame){
-            idleBackwards = true; // go backward animation
-        }
-        //if no longer attacking but in the middle of attack animation
-        else if(!isAttacking && currentFrame < idleFrame){
-            setToStartingFrame(); // reset animaiton
-        }
 
         // statements for attack animation
 
-        // if attacking and current frame is starting frame (animation is reset)
-        else if(isAttacking && currentFrame == incrementX){
-            currentFrame = idleFrame + incrementX; // set to the starting frame of the attacking frames
-        }
 
         // if attacking and current frame is an idle frame
-        else if(isAttacking && currentFrame <= idleFrame){
+        else if(isAttacking && currentFrame.x < idleFrameEnd && currentFrame.y <= incrementY){
             setToStartingFrame(); // set to starting frame to reset animation
         }
 
         // if attacking and current frame not yet reached end of image (end of attacking frames)
-        else if(isAttacking && currentFrame < getImageWidth()) {
-            Log.e(TAG, "Current Frame: " + currentFrame + ", Width: " + getImageWidth());
-            currentFrame += incrementX; // next frame
+        else if(isAttacking && currentFrame.x < attackFrameEnd && currentFrame.y > incrementY && !attackBackwards) {
+            currentFrame.x += incrementX; // next frame
         }
 
         // if attacking and current frame exceeds image width (more than end of attacking frames)
-        else if(isAttacking && currentFrame >= getImageWidth()) {
+        else if(isAttacking && currentFrame.x >= attackFrameEnd && currentFrame.y > incrementY) {
             readyToAttack = false; // attack has finished and needs to pause
             kill = true;
             isAttacking = false; // is no longer attacking
-            setToStartingFrame(); // reset animation for idle animation
+            attackBackwards = true; // reset animation for idle animation
         }
 
+        // if attack animation is finished backwards
+        else if(attackBackwards && currentFrame.x <= incrementX){
+            attackBackwards = false;
+            setToStartingFrame();
+        }
+
+        // if attack animation is going backwards for aesthetic purposes lmao
+        else if(attackBackwards){
+            currentFrame.x -= incrementX;
+        }
 
         pauseCountdown(); // if not attacking, timer for attack pause is triggered
 
     }
 
-    public int getCurrentFrame() {
+    public Point getCurrentFrame() {
         return currentFrame;
     }
 
     public int getIncrementX() {
         return incrementX;
+    }
+
+    public int getIncrementY() {
+        return incrementY;
     }
 
 
@@ -158,6 +169,9 @@ public abstract class Fighter extends Drawable {
     }
 
     public void pauseCountdown(){
+        if(isBeingDamaged())
+            damageFrame --;
+
         if(!isAttacking) {
             if(!readyToAttack) {
                 pauseCountdown -= 1000 / FPS; // 1000 here is number of millis in a second (im just ganna assume its per tick)
@@ -179,7 +193,12 @@ public abstract class Fighter extends Drawable {
     }
 
     public void setToStartingFrame(){
-        currentFrame = incrementX;
+        if(isAttacking)
+            currentFrame.y = incrementY * 2;
+
+        else
+            currentFrame.y = incrementY;
+        currentFrame.x = incrementX;
     }
 
     /*
