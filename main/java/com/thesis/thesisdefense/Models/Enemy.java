@@ -20,11 +20,12 @@ public abstract class Enemy extends Fighter{
     protected double speed;
     protected Ally Rival; // The ally the enemy is currently fighting
     protected int score; // coins earned when defeated
+    protected int scoreDisplayLength = 10;
 
     public Enemy(int posX, int poxY, int maxHealth, int damage, long attackPause,
-                int LaneY, Bitmap image, float scale, int idleFrame,
-                int numberOfFrames, double speed, double range, int score) {
-        super(posX, poxY, maxHealth, damage, image, scale, idleFrame, numberOfFrames, attackPause, range);
+                int LaneY, int incrementX, int incrementY, Bitmap image, float scale, int idleFrames,
+                int attackFrames, double speed, double range, int score) {
+        super(posX, poxY, maxHealth, damage, incrementX, incrementY, image, scale, idleFrames, attackFrames, attackPause, range);
 
         this.LaneY = LaneY; //which lane the enemey is
         this.speed = speed;
@@ -41,5 +42,10 @@ public abstract class Enemy extends Fighter{
 
     public int getLane(){
         return LaneY;
+    }
+
+    public boolean checkDisplayScore(){
+        scoreDisplayLength--;
+        return scoreDisplayLength == 0;
     }
 }

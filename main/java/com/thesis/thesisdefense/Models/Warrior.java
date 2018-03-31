@@ -12,8 +12,8 @@ public class Warrior extends Ally {
     public static int FRAME_HEIGHT;
 
     public Warrior(int posX, int poxY, int indexX, int indexY, Bitmap image, float scale) {
-        super(posX, poxY, 7, 2, 500, indexX, indexY, image, scale, 4, 10, 1);
+        super(posX, poxY, 7, 2, 500, indexX, indexY, 610, 468, image, scale, 7, 4, 1);
         FRAME_WIDTH = this.incrementX;
-        FRAME_HEIGHT = this.getImageHeight();
+        FRAME_HEIGHT = this.incrementY;
     }
 }

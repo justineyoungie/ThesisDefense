@@ -21,9 +21,10 @@ public abstract class Ally extends Fighter{
     */
 
     public Ally(int posX, int poxY, int maxHealth, int damage, long attackPause,
-                int indexX, int indexY, Bitmap image, float scale, int idleFrame,
-                int numberOfFrames, double range) {
-        super(posX, poxY, maxHealth, damage, image, scale, idleFrame, numberOfFrames, attackPause, range);
+                int indexX, int indexY, int incrementX, int incrementY,
+                Bitmap image, float scale, int idleFrames,
+                int attackFrames, double range) {
+        super(posX, poxY, maxHealth, damage, incrementX, incrementY,image, scale, idleFrames, attackFrames, attackPause, range);
         this.indexX = indexX;
         this.indexY = indexY;
         enemies = new ArrayList<>();
@@ -35,7 +36,7 @@ public abstract class Ally extends Fighter{
         for(int i = 0; i < curEnemies.size(); i++){
             Enemy enemy = curEnemies.get(i);
             if(!enemies.contains(enemy) && enemy.LaneY == indexY && enemy.getCurrentHealth() != 0 &&
-                    enemy.getPosX() <= this.posX+m_BlockSize*range+30 && enemy.getPosX() + (m_BlockSize + 60) / 2 > this.posX +30){
+                    enemy.getPosX() <= this.posX+m_BlockSize*range+30 && enemy.getPosX() + (m_BlockSize + 90) / 2 > this.posX + 30){
                 encounterEnemy(enemy);
             }
         }
