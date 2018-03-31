@@ -101,11 +101,11 @@ public abstract class Fighter extends Drawable {
         // 2 statements for idle animation
 
         // if not attacking and not yet reached end of idle frames and is not in attacking frames
-        if (!isAttacking && currentFrame.x < idleFrameEnd && currentFrame.y <= incrementY){
+        if (!isAttacking && currentFrame.x < idleFrameEnd && currentFrame.y == incrementY){
             currentFrame.x += incrementX;
         }
         // if not attacking and exceeded idle frames OR if not attacking and is in attacking frames
-        else if(!isAttacking && currentFrame.x >= idleFrameEnd && !attackBackwards || !isAttacking && currentFrame.y > incrementY && !attackBackwards){
+        else if(!isAttacking && currentFrame.x >= idleFrameEnd && !attackBackwards || !isAttacking && currentFrame.y == incrementY * 2 && !attackBackwards){
             setToStartingFrame(); // reset to first idle frame
         }
 
@@ -114,17 +114,17 @@ public abstract class Fighter extends Drawable {
 
 
         // if attacking and current frame is an idle frame
-        else if(isAttacking && currentFrame.x < idleFrameEnd && currentFrame.y <= incrementY){
+        else if(isAttacking && currentFrame.y == incrementY){
             setToStartingFrame(); // set to starting frame to reset animation
         }
 
         // if attacking and current frame not yet reached end of image (end of attacking frames)
-        else if(isAttacking && currentFrame.x < attackFrameEnd && currentFrame.y > incrementY && !attackBackwards) {
+        else if(isAttacking && currentFrame.x < attackFrameEnd && currentFrame.y == incrementY * 2 && !attackBackwards) {
             currentFrame.x += incrementX; // next frame
         }
 
         // if attacking and current frame exceeds image width (more than end of attacking frames)
-        else if(isAttacking && currentFrame.x >= attackFrameEnd && currentFrame.y > incrementY) {
+        else if(isAttacking && currentFrame.x >= attackFrameEnd && currentFrame.y == incrementY * 2) {
             readyToAttack = false; // attack has finished and needs to pause
             kill = true;
             isAttacking = false; // is no longer attacking
@@ -201,16 +201,7 @@ public abstract class Fighter extends Drawable {
         currentFrame.x = incrementX;
     }
 
-    /*
-    public int takeDamage(int dmg){
+    public int getIdleFrameEnd() {return idleFrameEnd; };
 
-        if(currentHealth -dmg <0){
-            currentHealth = 0;
-        }
-        else{
-            currentHealth -= dmg;
-        }
-        return currentHealth;
-    }
-    */
+    public int getAttackFrameEnd() {return  attackFrameEnd; };
 }

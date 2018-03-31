@@ -16,4 +16,17 @@ public class Warrior extends Ally {
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.incrementY;
     }
+
+    public int attackEnemy(){
+        if(!this.isAttacking && this.readyToAttack){
+            this.isAttacking = true;
+        }
+        if(this.kill){
+            kill = false;
+            if(enemies.get(0).calculateDamage(this.damage)){
+                return enemies.get(0).getScore();
+            }
+        }
+        return 0;
+    }
 }

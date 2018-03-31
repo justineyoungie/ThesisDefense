@@ -34,7 +34,7 @@ public abstract class Enemy extends Fighter{
         //FPS is how fast it moves and attacks
     }
 
-    public abstract void updateEnemy(Ally[][] allyMap, int m_BlockSize);
+    public abstract void updateEnemy(Ally[][] allyMap);
 
     public int getScore(){
         return score;
@@ -47,5 +47,10 @@ public abstract class Enemy extends Fighter{
     public boolean checkDisplayScore(){
         scoreDisplayLength--;
         return scoreDisplayLength == 0;
+    }
+
+
+    public void encounterAlly(Ally ally){
+        this.Rival = ally;
     }
 }
