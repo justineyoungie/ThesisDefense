@@ -56,7 +56,7 @@ public class MapView extends SurfaceView implements Runnable {
     private int m_dead_sound = -1;
 
     // What is the screen resolution
-    private int m_ScreenWidth;
+    public static int m_ScreenWidth;
     private int m_ScreenHeight;
 
     // Control pausing between updates
@@ -88,6 +88,7 @@ public class MapView extends SurfaceView implements Runnable {
     private Bitmap bitmapThesis;
     private Bitmap bitmapCastle;
     private Bitmap bitmapEnemy;
+    private Bitmap bitmapMageProjectile;
 
     /*
         For drawing allies to the map
@@ -110,7 +111,7 @@ public class MapView extends SurfaceView implements Runnable {
 
 
     // The size in pixels of one tile
-    private int m_BlockSize;
+    public static int m_BlockSize;
     private int m_NumBlocksHigh; // determined dynamically
 
     private ArrayList<Enemy> enemies;
@@ -198,7 +199,7 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapCastle = decodeSampleBitmapFromResource(this.getResources(), R.drawable.castle, 150, m_ScreenHeight / 2);
         bitmapThesis = BitmapFactory.decodeResource(this.getResources(), R.drawable.thesis);
 
-
+        bitmapMageProjectile = BitmapFactory.decodeResource(this.getResources(), R.drawable.mage_projectile);
 
 
         // reset everything
@@ -218,6 +219,9 @@ public class MapView extends SurfaceView implements Runnable {
             }
         }
 
+        // temporary instantiation
+        Wizard wizard = new Wizard(0, 0, 0, 0, bitmapWizard, bitmapMageProjectile, scale);
+        wizard = null;
         // Reset the m_Score
         m_Score = 150;
 
@@ -243,7 +247,6 @@ public class MapView extends SurfaceView implements Runnable {
         allyMap[0][3] = new Warrior(map[0][3].x, map[0][3].y,
                 3, 0,
                 bitmapWarrior, scale);
-
 
 
         // for now, manually add each time to the arraylists
@@ -414,6 +417,16 @@ public class MapView extends SurfaceView implements Runnable {
                                 map[y][x].x + m_BlockSize + 90,
                                 map[y][x].y + m_NumBlocksHigh);
                         m_Canvas.drawBitmap(ally.getImage(), src, dst, m_Paint);
+
+                        if(ally instanceof Wizard){
+                            ArrayList<Projectile> projectiles = ((Wizard) ally).getProjectiles();
+                            for(int i = 0; i < projectiles.size(); i++){
+                                Projectile proj = projectiles.get(i);
+                                src = new Rect(0, 0, bitmapMageProjectile.getWidth(), bitmapMageProjectile.getHeight());
+                                dst = new Rect(proj.getPosX(), proj.getPosY(), (int)(proj.getPosX() + 50 * scale), (int)(proj.getPosY() + 50 * scale));
+                                m_Canvas.drawBitmap(bitmapMageProjectile, src, dst, null);
+                            }
+                        }
                     }
                 }
             }
@@ -427,6 +440,7 @@ public class MapView extends SurfaceView implements Runnable {
             }
 
             m_Paint.reset();
+
             // Choose how big the score will be
             m_Paint.setTextSize(30);
             m_Paint.setColor(Color.rgb(255, 255, 255));
@@ -496,9 +510,9 @@ public class MapView extends SurfaceView implements Runnable {
             if(isSelecting){
                 if(selectedAlly.equals("Wizard")) {
                     src = new Rect(0, 0, Wizard.FRAME_WIDTH, Wizard.FRAME_HEIGHT);
-                    dst = new Rect( cursorLocation.x - (m_BlockSize + 80) / 2, // to center the image on the cursor
+                    dst = new Rect( cursorLocation.x - (m_BlockSize + 90) / 2, // to center the image on the cursor
                                     cursorLocation.y - (m_NumBlocksHigh) / 2 - 25,
-                                    cursorLocation.x + (m_BlockSize + 80) / 2,
+                                    cursorLocation.x + (m_BlockSize + 90) / 2,
                                     cursorLocation.y + (m_NumBlocksHigh) / 2 + 25);
                 }
                 else if(selectedAlly.equals("Warrior")){
@@ -508,7 +522,6 @@ public class MapView extends SurfaceView implements Runnable {
                                     cursorLocation.x + (m_BlockSize + 90) / 2,
                                     cursorLocation.y + m_NumBlocksHigh / 2 + 25);
                 }
-
 
                 //check if cursor is within map
                 for(int y = 0; y < map.length; y++){
@@ -521,7 +534,7 @@ public class MapView extends SurfaceView implements Runnable {
                             allyMap[y][x] == null){ // if within a block inside map and has no one occupying it
                             dst = new Rect( map[y][x].x, // to center the image on the cursor
                                             map[y][x].y - 50,
-                                            map[y][x].x + m_BlockSize + 80,
+                                            map[y][x].x + m_BlockSize + 90,
                                             map[y][x].y + m_NumBlocksHigh);
                         }
                     }
@@ -609,7 +622,21 @@ public class MapView extends SurfaceView implements Runnable {
                         allyMap[y][x] = null;
                     }
                     else {
+                        // update ally is immediate damage
                         m_Score += ally.updateAlly(enemies, m_BlockSize);
+
+                        // check contact is for projectiles with damage
+                        if(ally instanceof Wizard){
+                            for(int i = 0; i < ((Wizard) ally).getProjectiles().size(); i++){
+                                Projectile proj = ((Wizard) ally).getProjectiles().get(i);
+                                if(proj.hasEncountered()){
+                                    ((Wizard) ally).removeProjectile(proj);
+                                }
+                                else
+                                    m_Score += proj.checkContact(enemies);
+                            }
+                        }
+
                     }
                 }
             }
@@ -619,16 +646,16 @@ public class MapView extends SurfaceView implements Runnable {
         for(int y = 0; y < enemies.size(); y++){
             Enemy enemy = enemies.get(y);
             if(enemy.isDead()){
-                killedEnemies.add(enemy);
+                //killedEnemies.add(enemy);
                 enemies.remove(enemy);
 
             }
             else {
-                enemy.updateEnemy(allyMap, m_BlockSize);
+                enemy.updateEnemy(allyMap);
             }
         }
 
-
+/*
         // updates killed enemies; removes those who have passed the scoreDisplayLength
         for(int x = 0; x < killedEnemies.size(); x ++){
             Enemy enemy = killedEnemies.get(x);
@@ -636,7 +663,7 @@ public class MapView extends SurfaceView implements Runnable {
                 killedEnemies.remove(enemy); // remove enemy from killedEnemies
             }
         }
-
+*/
 
         // spawns enemies; winCon is set when each wave is done
         for(int j = 0; j < enemySpawnTime[currentWave].size(); j++){
@@ -744,7 +771,7 @@ public class MapView extends SurfaceView implements Runnable {
                             isSelecting && allyMap[y][x] == null){ // and no one's occupying the spot
                             // insert whoever's selected
                             if(selectedAlly.equals("Wizard")) {
-                                allyMap[y][x] = new Wizard(map[y][x].x, map[y][x].y, x, y, bitmapWizard, scale);
+                                allyMap[y][x] = new Wizard(map[y][x].x, map[y][x].y, x, y, bitmapWizard, bitmapMageProjectile, scale);
                                 m_Score -= 100;
                             }
                             else if(selectedAlly.equals("Warrior")) {

@@ -1,8 +1,11 @@
 package com.thesis.thesisdefense.Models;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import java.util.ArrayList;
+
+import static com.thesis.thesisdefense.Activities.MapView.TAG;
 
 /**
  * Created by justine on 3/5/18.
@@ -47,21 +50,16 @@ public abstract class Ally extends Fighter{
             this.isAttacking = false;
         }
         else {
-            if(!this.isAttacking && this.readyToAttack){
-                this.isAttacking = true;
-            }
-            if(this.kill){
-                boolean isDead = enemies.get(0).calculateDamage(this.damage); //get health after current dmg, idk wat to do with it xd it was handled by the loop
-                kill = false;
-
-                if (isDead){
-                    return enemies.get(0).getScore();
-                }
-            }
+            return this.attackEnemy();
         }
         return 0;
     }
     public void encounterEnemy(Enemy enemy){ //when enemy is in range,
         enemies.add(enemy);
     }
+
+    public abstract int attackEnemy();
+
+    public ArrayList<Enemy> getEnemies() { return enemies; }
+
 }
