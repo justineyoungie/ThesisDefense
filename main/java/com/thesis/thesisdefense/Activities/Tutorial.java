@@ -18,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.thesis.thesisdefense.Misc.Dialog;
 import com.thesis.thesisdefense.Models.*;
 import com.thesis.thesisdefense.R;
 
@@ -73,8 +74,7 @@ public class Tutorial extends SurfaceView implements Runnable {
     // The current m_Score
     private int m_Score;
 
-    private int currentWave = 0;
-    private int maxWave = 5;
+
 
     /*// The location in the grid of all the segments
     private int[] m_SnakeXs;
@@ -124,7 +124,18 @@ public class Tutorial extends SurfaceView implements Runnable {
     private boolean gameOver = false;
     private boolean winCon = false;
 
+    public ArrayList<String> dialogtexts = new ArrayList<>();
+    private Dialog dialog;
 
+    private int waitTime = 0; //Delay variable, if 0 delay is over
+    private int scene = 0; //What scene are we on?
+    private int dialogTextSize = 50;
+
+
+    //Variables for Tutorial//
+        private boolean tutorialPass;
+        private boolean canSwitchScene = true;
+    /////
     public Tutorial(Context context, Point size) {
         super(context);
         m_context = context;
@@ -156,8 +167,10 @@ public class Tutorial extends SurfaceView implements Runnable {
         while (m_Playing) {
             // Update 10 times a second
             if(checkForUpdate()) {
-                updateGame();
-                drawGame();
+
+                    updateGame();
+                    drawGame();
+
             }
         }
     }
@@ -203,10 +216,7 @@ public class Tutorial extends SurfaceView implements Runnable {
 
 
         // reset everything
-        currentWave = 0;
         allyMap = new Ally[5][8];
-        enemyCount = new int[maxWave];
-        enemySpawnTime = new ArrayList[maxWave];
         timePassedPerWave = 0;
         gameOver = false;
         winner = false;
@@ -220,17 +230,15 @@ public class Tutorial extends SurfaceView implements Runnable {
         }
 
         // temporary instantiation
-        Wizard wizard = new Wizard(0, 0, 0, 0, bitmapWizard, bitmapMageProjectile, scale);
+        Wizard wizard = new Wizard(0, 0, 0, 0, bitmapWizard, bitmapMageProjectile, scale,m_BlockSize,m_ScreenWidth);
         wizard = null;
         // Reset the m_Score
         m_Score = 150;
 
         // initialize the spawn times
-        for(int i = 0; i < 5; i ++){
-            enemySpawnTime[i] = new ArrayList<Long>();
-        }
 
 
+        /*
 
         allyMap[4][3] = new Warrior(map[4][3].x, map[4][3].y,
                 3, 4,
@@ -248,8 +256,9 @@ public class Tutorial extends SurfaceView implements Runnable {
                 3, 0,
                 bitmapWarrior, scale);
 
-
+        */
         // for now, manually add each time to the arraylists
+        /*
         Random rand = new Random();
         enemyCount[0] = rand.nextInt(5) + 1;
         enemyCount[1] = rand.nextInt(5) + 1;
@@ -273,7 +282,7 @@ public class Tutorial extends SurfaceView implements Runnable {
                 }
             }
         }
-
+        */
         // Setup m_NextFrameTime so an update is triggered immediately
         m_NextFrameTime = System.currentTimeMillis();
 
@@ -447,7 +456,7 @@ public class Tutorial extends SurfaceView implements Runnable {
             m_Canvas.drawText("Coins: " + m_Score, (int) 460 * scale, (int)40 * scale, m_Paint);
 
 
-            m_Canvas.drawText("Wave: " + (currentWave + 1) + "/" + maxWave, (int) 380 * scale, (int)40 * scale, m_Paint);
+            m_Canvas.drawText("Tutorial: " + (scene) + "/5", (int) 380 * scale, (int)40 * scale, m_Paint);
 
             m_Paint.reset();
             //pause button
@@ -588,6 +597,10 @@ public class Tutorial extends SurfaceView implements Runnable {
                 m_Canvas.drawText("(Click anywhere to continue)", m_ScreenWidth / 2, m_ScreenHeight / 2, m_Paint);
             }
 
+            if(dialogtexts != null) {
+                dialog = new Dialog(m_Canvas.getWidth(), m_Canvas.getHeight(), scale);
+                dialog.drawDialog(m_Canvas, dialogtexts, m_Paint, dialogTextSize);
+            }
             // Draw the whole frame
             m_Holder.unlockCanvasAndPost(m_Canvas);
         }
@@ -596,6 +609,7 @@ public class Tutorial extends SurfaceView implements Runnable {
     public boolean checkForUpdate() {
 
         // Are we due to update the frame
+
         if(m_NextFrameTime <= System.currentTimeMillis()){
             // Tenth of a second has passed
 
@@ -666,19 +680,8 @@ public class Tutorial extends SurfaceView implements Runnable {
 */
 
         // spawns enemies; winCon is set when each wave is done
-        for(int j = 0; j < enemySpawnTime[currentWave].size(); j++){
-            long spawn = enemySpawnTime[currentWave].get(j);
-            if(spawn <= timePassedPerWave){
+        //this.summonEnemy(rand.nextInt(5));
 
-                Random rand = new Random();
-
-                this.summonEnemy(rand.nextInt(5));
-                enemySpawnTime[currentWave].remove((int) j);
-                if(currentWave == enemySpawnTime.length - 1) {
-                    winCon = true;
-                }
-            }
-        }
 
         for(int i = 0; i < enemies.size(); i ++){
             Enemy enemy = enemies.get(i);
@@ -689,15 +692,20 @@ public class Tutorial extends SurfaceView implements Runnable {
                 break;
             }
         }
-        if(enemySpawnTime[currentWave].size() == 0 && enemies.size() == 0 && currentWave < enemySpawnTime.length - 1) {
-            currentWave++;
-            timePassedPerWave = 0;
+
+        if(waitTime > 0) {
+            waitTime-=1;
+        }
+        else{
+            if(canSwitchScene) {
+                setScene();
+
+            }
+            updateScene();
+
         }
 
-        else if(currentWave == maxWave - 1 && enemies.size() == 0 && winCon){
-            winner = true;
-            //m_Playing = false;
-        }
+
 
     }
 
@@ -771,7 +779,7 @@ public class Tutorial extends SurfaceView implements Runnable {
                                 isSelecting && allyMap[y][x] == null){ // and no one's occupying the spot
                             // insert whoever's selected
                             if(selectedAlly.equals("Wizard")) {
-                                allyMap[y][x] = new Wizard(map[y][x].x, map[y][x].y, x, y, bitmapWizard, bitmapMageProjectile, scale);
+                                allyMap[y][x] = new Wizard(map[y][x].x, map[y][x].y, x, y, bitmapWizard, bitmapMageProjectile, scale,m_BlockSize,m_ScreenWidth);
                                 m_Score -= 100;
                             }
                             else if(selectedAlly.equals("Warrior")) {
@@ -825,7 +833,7 @@ public class Tutorial extends SurfaceView implements Runnable {
     }
 
     public void summonEnemy(int lane){ //Base index 0, until 4??
-        Enemy panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapEnemy,scale);
+        Enemy panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapEnemy,scale,m_BlockSize);
         enemies.add(panel);
     }
 
@@ -847,5 +855,53 @@ public class Tutorial extends SurfaceView implements Runnable {
         bitmapThesis = null;
         bitmapCastle = null;
         bitmapEnemy = null;
+    }
+    public void setVariables(){
+        dialogtexts = null;
+        waitTime = 0;
+        scene = 0;
+        dialogTextSize = 50;
+        canSwitchScene = true;
+
+    }
+    public void setScene(){
+        canSwitchScene = false;
+        scene++;
+        if(scene == 1){
+            dialogtexts = new ArrayList<>();
+            dialogtexts.add("Hello there! I see you are here to defend your thesis");
+            dialogtexts.add("First off to defend your thesis, You have to form a good team");
+            dialogtexts.add("Drag an drop units from the upper left screen to the field to prepare to defend your thesis");
+            dialogTextSize = 50;
+
+        }
+        else{
+            dialogtexts = new ArrayList<>();
+            dialogtexts.add("Testing mothafaka bitch");
+
+        }
+
+    }
+    public void updateScene(){
+        if(scene == 1){
+            if(!tutorialPass) {
+                for (int i = 0; i < allyMap.length; i++) {
+                    for (int j = 0; j < allyMap[i].length; j++) {
+                        if (allyMap[i][j] != null) {
+                            tutorialPass = true;
+                        }
+                    }
+                }
+
+                if (tutorialPass) {
+                    dialogtexts = null;
+                    waitTime = 50;
+
+                }
+            }
+            else{
+                canSwitchScene = true;
+            }
+        }
     }
 }

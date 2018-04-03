@@ -220,7 +220,7 @@ public class MapView extends SurfaceView implements Runnable {
         }
 
         // temporary instantiation
-        Wizard wizard = new Wizard(0, 0, 0, 0, bitmapWizard, bitmapMageProjectile, scale);
+        Wizard wizard = new Wizard(0, 0, 0, 0, bitmapWizard, bitmapMageProjectile, scale,m_BlockSize,m_ScreenWidth);
         wizard = null;
         // Reset the m_Score
         m_Score = 150;
@@ -771,7 +771,7 @@ public class MapView extends SurfaceView implements Runnable {
                             isSelecting && allyMap[y][x] == null){ // and no one's occupying the spot
                             // insert whoever's selected
                             if(selectedAlly.equals("Wizard")) {
-                                allyMap[y][x] = new Wizard(map[y][x].x, map[y][x].y, x, y, bitmapWizard, bitmapMageProjectile, scale);
+                                allyMap[y][x] = new Wizard(map[y][x].x, map[y][x].y, x, y, bitmapWizard, bitmapMageProjectile, scale,m_BlockSize,m_ScreenWidth);
                                 m_Score -= 100;
                             }
                             else if(selectedAlly.equals("Warrior")) {
@@ -821,7 +821,7 @@ public class MapView extends SurfaceView implements Runnable {
     }
 
     public void summonEnemy(int lane){ //Base index 0, until 4??
-        Enemy panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapEnemy,scale);
+        Enemy panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapEnemy,scale,m_BlockSize);
         enemies.add(panel);
     }
 

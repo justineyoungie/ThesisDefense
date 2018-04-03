@@ -16,12 +16,15 @@ public class Projectile extends Drawable{
     private int width; //for contact with enemy purposes
     private boolean hasEncountered = false;
     private int speed;
-
-    public Projectile(int posX, int posY, Bitmap image, float scale, Fighter launcher, int width, int speed){
+    private int m_blockSize;
+    private int m_ScreenWidth;
+    public Projectile(int posX, int posY, Bitmap image, float scale, Fighter launcher, int width, int speed, int m_blocksize, int m_ScreenWidth){
         super(posX, posY, image, scale);
         this.launcher = launcher;
         this.width = width;
         this.speed = speed;
+        this.m_blockSize = m_blocksize;
+        this.m_ScreenWidth = m_ScreenWidth;
     }
 
     //for allies with projectiles
@@ -34,7 +37,7 @@ public class Projectile extends Drawable{
 
             // if projectile hits enemy; I'm not good at contact between two objects I'm sorry :(
             if( enemy.posX <= this.posX + width * scale &&
-                this.posX >= enemy.posX - MapView.m_BlockSize / 2 &&
+                this.posX >= enemy.posX - m_blockSize / 2 &&
                 enemy.getLane() == ((Ally)launcher).indexY){ // and enemy is same lane as launcher of attack
                 if(((Ally) launcher).getEnemies().size() != 0) { // band-aid to unexpected IndexOutOfBoundsException
                     hasEncountered = true;
@@ -43,7 +46,7 @@ public class Projectile extends Drawable{
                     }
                 }
             }
-            else if(posX > MapView.m_ScreenWidth){
+            else if(posX > m_ScreenWidth){
                 hasEncountered = true;
             }
         }
@@ -56,8 +59,8 @@ public class Projectile extends Drawable{
         for(int y = 0; y < allyMap.length; y++){
             for(int x = 0; x < allyMap[y].length; x++){
                 Ally ally = allyMap[y][x];
-                if( this.posX <= ally.posX + MapView.m_BlockSize + 90 &&
-                    ally.posX + (MapView.m_BlockSize + 90) / 2 >= this.posX + width / 2){
+                if( this.posX <= ally.posX + m_blockSize+ 90 &&
+                    ally.posX + (m_blockSize + 90) / 2 >= this.posX + width / 2){
                     ((Enemy) launcher).encounterAlly(ally);
                     hasEncountered = true;
                 }
