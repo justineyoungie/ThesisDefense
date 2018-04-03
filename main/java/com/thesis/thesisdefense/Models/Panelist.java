@@ -42,7 +42,7 @@ public class Panelist extends Enemy{
             this.posX -= this.speed;
         }
         else{
-            if(Rival.currentHealth == 0){
+            if(Rival.isDead()){
                 Rival = null;
             }
             else {

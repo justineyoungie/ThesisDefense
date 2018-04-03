@@ -74,7 +74,7 @@ public class MapView extends SurfaceView implements Runnable {
     private int m_Score;
 
     private int currentWave = 0;
-    private int maxWave = 5;
+    private int maxWave = 3;
 
     /*// The location in the grid of all the segments
     private int[] m_SnakeXs;
@@ -89,6 +89,11 @@ public class MapView extends SurfaceView implements Runnable {
     private Bitmap bitmapCastle;
     private Bitmap bitmapEnemy;
     private Bitmap bitmapMageProjectile;
+    private Bitmap bitmapSpells;
+
+    private Bitmap bitmapFire;
+    private Bitmap bitmapIce;
+    private Bitmap bitmapThunder;
 
     /*
         For drawing allies to the map
@@ -97,6 +102,8 @@ public class MapView extends SurfaceView implements Runnable {
     private String selectedAlly = "";
 
     // private Ally selectedAlly;
+    private float startX;
+    private float startY;
     private Point cursorLocation = new Point();
 
     private Point[][] map;
@@ -115,14 +122,20 @@ public class MapView extends SurfaceView implements Runnable {
     private int m_NumBlocksHigh; // determined dynamically
 
     private ArrayList<Enemy> enemies;
-    private ArrayList<Enemy> killedEnemies;
     private MediaPlayer player;
     private int[] enemyCount;
-    private ArrayList<Long>[] enemySpawnTime;
+    private ArrayList<Integer>[] enemySpawnTime;
     private int timePassedPerWave = 0;
     private boolean winner = false;
     private boolean gameOver = false;
     private boolean winCon = false;
+
+    private int spellY = -10;
+
+    private ArrayList<int[]> killedEnemies;
+
+    private String spellActivated = "";
+    private ArrayList<Spell> spellsActive;
 
 
     public MapView(Context context, Point size) {
@@ -140,6 +153,28 @@ public class MapView extends SurfaceView implements Runnable {
         // Initialize the drawing objects
         m_Holder = getHolder();
         m_Paint = new Paint();
+
+
+        bitmapBackground = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
+
+        // wizard
+        bitmapWizard = decodeSampleBitmapFromResource(this.getResources(), R.drawable.mage, 250, 250);
+        bitmapWizardIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.mage_icon);
+
+        bitmapWarrior = decodeSampleBitmapFromResource(this.getResources(), R.drawable.knight, 250, 250);
+        bitmapWarriorIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.knight_icon);
+
+        bitmapEnemy = decodeSampleBitmapFromResource(this.getResources(), R.drawable.enemy_knight, 250, 250);
+
+        bitmapCastle = decodeSampleBitmapFromResource(this.getResources(), R.drawable.castle, 150, m_ScreenHeight / 2);
+        bitmapThesis = BitmapFactory.decodeResource(this.getResources(), R.drawable.thesis);
+
+        bitmapMageProjectile = BitmapFactory.decodeResource(this.getResources(), R.drawable.mage_projectile);
+        bitmapSpells = BitmapFactory.decodeResource(this.getResources(), R.drawable.spells);
+
+        bitmapFire = BitmapFactory.decodeResource(this.getResources(), R.drawable.spell_fire);
+        bitmapIce = BitmapFactory.decodeResource(this.getResources(), R.drawable.spell_ice);
+        bitmapThunder = BitmapFactory.decodeResource(this.getResources(), R.drawable.spell_thunder);
 
 
         loadSound();
@@ -169,6 +204,8 @@ public class MapView extends SurfaceView implements Runnable {
         } catch (InterruptedException e) {
             // Error
         }
+
+        player.pause();
         drawGame();
     }
 
@@ -176,41 +213,26 @@ public class MapView extends SurfaceView implements Runnable {
         m_Playing = true;
         m_Thread = new Thread(this);
         m_Thread.start();
+        player.start();
 
     }
 
     public void startGame() {
         // initializing resources
 
-        bitmapBackground = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
-
-        // wizard
-        bitmapWizard = decodeSampleBitmapFromResource(this.getResources(), R.drawable.mage, 250, 250);
-        bitmapWizardIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.mage_icon);
-
-        bitmapWarrior = decodeSampleBitmapFromResource(this.getResources(), R.drawable.knight, 250, 250);
-        bitmapWarriorIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.knight_icon);
-
-        bitmapEnemy = decodeSampleBitmapFromResource(this.getResources(), R.drawable.enemy_knight, 250, 250);
-
-        map = new Point[5][8];
-
-        enemies = new ArrayList<Enemy>();
-        bitmapCastle = decodeSampleBitmapFromResource(this.getResources(), R.drawable.castle, 150, m_ScreenHeight / 2);
-        bitmapThesis = BitmapFactory.decodeResource(this.getResources(), R.drawable.thesis);
-
-        bitmapMageProjectile = BitmapFactory.decodeResource(this.getResources(), R.drawable.mage_projectile);
-
-
         // reset everything
         currentWave = 0;
         allyMap = new Ally[5][8];
         enemyCount = new int[maxWave];
         enemySpawnTime = new ArrayList[maxWave];
+        map = new Point[5][8];
+
+        enemies = new ArrayList<>();
         timePassedPerWave = 0;
         gameOver = false;
         winner = false;
-        killedEnemies = new ArrayList<Enemy>();
+        killedEnemies = new ArrayList<>();
+        spellsActive = new ArrayList<>();
 
         // Load the points of each tile
         for(int y = 0; y < map.length; y++){
@@ -220,14 +242,16 @@ public class MapView extends SurfaceView implements Runnable {
         }
 
         // temporary instantiation
-        Wizard wizard = new Wizard(0, 0, 0, 0, bitmapWizard, bitmapMageProjectile, scale);
-        wizard = null;
+        new Wizard(0, 0, 0, 0, bitmapWizard, bitmapMageProjectile, 0);
+        new Warrior(0, 0, 0, 0, bitmapWarrior, 0);
+
+
         // Reset the m_Score
         m_Score = 150;
 
         // initialize the spawn times
-        for(int i = 0; i < 5; i ++){
-            enemySpawnTime[i] = new ArrayList<Long>();
+        for(int i = 0; i < maxWave; i ++){
+            enemySpawnTime[i] = new ArrayList<Integer>();
         }
 
 
@@ -251,29 +275,30 @@ public class MapView extends SurfaceView implements Runnable {
 
         // for now, manually add each time to the arraylists
         Random rand = new Random();
-        enemyCount[0] = rand.nextInt(5) + 1;
-        enemyCount[1] = rand.nextInt(5) + 1;
-        enemyCount[2] = rand.nextInt(8) + 1;
-        enemyCount[3] = rand.nextInt(10) + 1;
-        enemyCount[4] = rand.nextInt(15) + 1;
+        enemyCount[0] = 3;
+        enemyCount[1] = 5;
+        enemyCount[2] = 8;
 
+        enemySpawnTime[0].add(10000);
+        enemySpawnTime[0].add(18000);
+        enemySpawnTime[0].add(24000);
 
-        for(int i = 0; i < enemyCount.length; i++){
-            for(int y = 0; y < enemyCount[i]; y++){
-                if(y == 0 && i == 0){
-                    enemySpawnTime[i].add((long) 10000);
-                }
-                else if (i == 0){
-                    int time = rand.nextInt(100) + 1;
-                    enemySpawnTime[i].add((long) (time * 100 + 10000));
-                }
-                else{
-                    int time = rand.nextInt(100) + 1;
-                    enemySpawnTime[i].add((long) (time * 100));
-                }
-            }
-        }
+        enemySpawnTime[1].add(0);
+        enemySpawnTime[1].add(2000);
+        enemySpawnTime[1].add(7000);
+        enemySpawnTime[1].add(12000);
+        enemySpawnTime[1].add(14000);
 
+        enemySpawnTime[2].add(2000);
+        enemySpawnTime[2].add(6000);
+        enemySpawnTime[2].add(10000);
+        enemySpawnTime[2].add(11000);
+        enemySpawnTime[2].add(16000);
+        enemySpawnTime[2].add(21000);
+        enemySpawnTime[2].add(23000);
+        enemySpawnTime[2].add(23500);
+
+        resume();
         // Setup m_NextFrameTime so an update is triggered immediately
         m_NextFrameTime = System.currentTimeMillis();
 
@@ -287,30 +312,25 @@ public class MapView extends SurfaceView implements Runnable {
             player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
-                    Log.e(TAG, "Henlo");
                     mp.start();
                 }
             });
             player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-                    Log.e(TAG, "Henloers");
                     mp.start();
                 }
             });
             player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                 @Override
                 public boolean onError(MediaPlayer mp, int what, int extra) {
-                    Log.e(TAG, "wew");
                     return false;
                 }
             });
             player.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());
-            Log.e(TAG, "Henlongers");
             player.prepare();
             player.start();
         } catch (IOException e) {
-            Log.e(TAG, "error");
             e.printStackTrace();
         }
        /*
@@ -334,6 +354,7 @@ public class MapView extends SurfaceView implements Runnable {
         }
         */
     }
+
 
     public void drawGame() {
         // Prepare to draw
@@ -360,7 +381,7 @@ public class MapView extends SurfaceView implements Runnable {
                     if((i + j) % 2== 0) m_Paint.setColor(Color.argb(150,70, 140, 46));
                     else                m_Paint.setColor(Color.argb(150, 76, 154, 75));
                     m_Canvas.drawRect(map[i][j].x, map[i][j].y,
-                            map[i][j].x + m_BlockSize, map[i][j].y + m_NumBlocksHigh, m_Paint);
+                    map[i][j].x + m_BlockSize, map[i][j].y + m_NumBlocksHigh, m_Paint);
                 }
             }
 
@@ -433,10 +454,10 @@ public class MapView extends SurfaceView implements Runnable {
 
             // Draw score gotten from dead enemies if applicable
             for(int x = 0; x < killedEnemies.size(); x++){
-                Enemy killedEnemy = killedEnemies.get(x);
+                int[] killedEnemy = killedEnemies.get(x);
                 m_Paint.setTextSize(24);
                 m_Paint.setColor(Color.rgb(255, 255, 255));
-                m_Canvas.drawText("+" + killedEnemy.getScore(), killedEnemy.getPosX() + (m_BlockSize + 40) / 2, killedEnemy.getPosY() - 30, m_Paint);
+                m_Canvas.drawText("+" + killedEnemy[3], killedEnemy[0] + (m_BlockSize + 40) / 2, killedEnemy[1] - 30, m_Paint);
             }
 
             m_Paint.reset();
@@ -453,24 +474,25 @@ public class MapView extends SurfaceView implements Runnable {
             //pause button
             Bitmap pause = BitmapFactory.decodeResource(this.getResources(), android.R.drawable.ic_media_pause);
             src = new Rect(0, 0, pause.getWidth(), pause.getHeight());
-            dst = new Rect( Math.round(580 * scale),
+            dst = new Rect( Math.round(m_ScreenWidth - 50 * scale),
                             Math.round(20 * scale),
-                            Math.round(610 * scale),
+                            Math.round(m_ScreenWidth - 20 * scale),
                             Math.round(50 * scale));
             m_Canvas.drawBitmap(pause, src, dst, m_Paint);
 
             //fast forward button
             Bitmap ff = BitmapFactory.decodeResource(this.getResources(), android.R.drawable.ic_media_ff);
             src = new Rect(0, 0, pause.getWidth(), pause.getHeight());
-            dst = new Rect( Math.round(540 * scale),
+            dst = new Rect( Math.round(m_ScreenWidth - 100 * scale),
                     Math.round(20 * scale),
-                    Math.round(570 * scale),
+                    Math.round(m_ScreenWidth - 70 * scale),
                     Math.round(50 * scale));
             if(FPS == 30)
                 m_Paint.setColorFilter(new LightingColorFilter(0xFF7F7F7F, 0x00000000));
             m_Canvas.drawBitmap(ff, src, dst, m_Paint);
 
             m_Paint.reset();
+
             // wizard icon for selection
             src = new Rect(0, 0, bitmapWizardIcon.getWidth(), bitmapWizardIcon.getHeight());
             dst = new Rect( Math.round(40*scale),
@@ -505,6 +527,76 @@ public class MapView extends SurfaceView implements Runnable {
 
             m_Paint.reset();
 
+
+            // spell container
+            src = new Rect( 0, 0, bitmapSpells.getWidth(), bitmapSpells.getHeight());
+            dst = new Rect( (int) (m_ScreenWidth - 200 * scale),    (int) (m_ScreenHeight + spellY * scale),
+                            (int) (m_ScreenWidth - 10 * scale),     (int) (m_ScreenHeight + (spellY + 110) * scale));
+            m_Canvas.drawBitmap(bitmapSpells, src, dst, null);
+
+            // spell fire
+            src = new Rect(0, 0, bitmapFire.getWidth(), bitmapFire.getHeight());
+            dst = new Rect( (int) (m_ScreenWidth - 190 * scale),    (int) (m_ScreenHeight + (spellY + 30) * scale),
+                            (int) (m_ScreenWidth - 140 * scale),     (int) (m_ScreenHeight + (spellY + 80) * scale));
+            m_Canvas.drawBitmap(bitmapFire, src, dst, null);
+
+            //spell ice
+            // src = new Rect(0,0, bitmapIce.getWidth(), bitmapIce.getHeight());
+            dst = new Rect( (int) (m_ScreenWidth - 130 * scale),    (int) (m_ScreenHeight + (spellY + 30) * scale),
+                            (int) (m_ScreenWidth - 80 * scale),    (int) (m_ScreenHeight + (spellY + 80) * scale));
+            m_Canvas.drawBitmap(bitmapIce, src, dst, null);
+
+            //spell thunder
+            // src = new Rect(0,0, bitmapThunder.getWidth(), bitmapThunder.getHeight());
+            dst = new Rect( (int) (m_ScreenWidth - 70 * scale),    (int) (m_ScreenHeight + (spellY + 30) * scale),
+                            (int) (m_ScreenWidth - 20 * scale),    (int) (m_ScreenHeight + (spellY + 80) * scale));
+            m_Canvas.drawBitmap(bitmapThunder, src, dst, null);
+
+
+            // set spells ablaze
+            for(int i = 0; i < spellsActive.size(); i++){
+                Spell spell = spellsActive.get(i);
+                if(spell instanceof Fire){
+                    m_Paint.setARGB(60, 230,50,50);
+                    ArrayList<Point> affected = spell.getAreaOfEffect();
+                    for(int j = 0; j < affected.size(); j ++){
+                        Point block = affected.get(j);
+                        m_Canvas.drawRect(  map[block.y][block.x].x,
+                                            map[block.y][block.x].y,
+                                            map[block.y][block.x].x + m_BlockSize,
+                                            map[block.y][block.x].y + m_NumBlocksHigh,
+                                            m_Paint);
+                    }
+
+                }
+                else if(spell instanceof Thunder){
+                    m_Paint.setARGB(60, 153, 0, 255);
+                    ArrayList<Point> affected = spell.getAreaOfEffect();
+                    for(int j = 0; j < affected.size(); j ++){
+                        Point block = affected.get(j);
+                        m_Canvas.drawRect(  map[block.y][block.x].x,
+                                map[block.y][block.x].y,
+                                map[block.y][block.x].x + m_BlockSize,
+                                map[block.y][block.x].y + m_NumBlocksHigh,
+                                m_Paint);
+                    }
+                }
+
+                else if(spell instanceof Ice){
+                    m_Paint.setARGB(60, 40, 43, 237);
+                    ArrayList<Point> affected = spell.getAreaOfEffect();
+                    for(int j = 0; j < affected.size(); j ++){
+                        Point block = affected.get(j);
+                        m_Canvas.drawRect(  map[block.y][block.x].x,
+                                            map[block.y][block.x].y,
+                                            map[block.y][block.x].x + m_BlockSize,
+                                            map[block.y][block.x].y + m_NumBlocksHigh,
+                                            m_Paint);
+                    }
+                }
+            }
+
+            m_Paint.reset();
 
             // if user is dragging an ally from the options to the map
             if(isSelecting){
@@ -545,9 +637,7 @@ public class MapView extends SurfaceView implements Runnable {
                     m_Canvas.drawBitmap(bitmapWizard, src, dst, m_Paint);
                 else if(selectedAlly.equals("Warrior"))
                     m_Canvas.drawBitmap(bitmapWarrior, src, dst, m_Paint);
-
             }
-
 
             if(winner){
                 m_Paint.setARGB(60, 0,0,0);
@@ -607,12 +697,10 @@ public class MapView extends SurfaceView implements Runnable {
             // functions are executed
             return true;
         }
-
         return false;
     }
 
     public void updateGame() {
-
         // update each ally; next frame, attack or remove when dead
         for(int y = 0; y < allyMap.length; y++){
             for(int x = 0; x < allyMap[y].length; x++){
@@ -642,44 +730,75 @@ public class MapView extends SurfaceView implements Runnable {
             }
         }
 
+        ArrayList<Enemy> tempo = new ArrayList<>();
         // update each enemy; next frame, attack or remove when dead
         for(int y = 0; y < enemies.size(); y++){
             Enemy enemy = enemies.get(y);
             if(enemy.isDead()){
-                //killedEnemies.add(enemy);
-                enemies.remove(enemy);
-
+                int[] temp = new int[4];
+                temp[0] = enemy.getPosX();
+                temp[1] = enemy.getPosY();
+                temp[2] = 10;
+                temp[3] = enemy.getScore();
+                killedEnemies.add(temp);
+                tempo.add(enemy);
             }
             else {
                 enemy.updateEnemy(allyMap);
             }
         }
 
-/*
+        //removes enemies from enemySpawnTime[currentWave] to update the enemies being spawned
+        for(int j = 0; j < tempo.size(); j++){
+            enemies.remove(tempo.get(j));
+        }
+
         // updates killed enemies; removes those who have passed the scoreDisplayLength
         for(int x = 0; x < killedEnemies.size(); x ++){
-            Enemy enemy = killedEnemies.get(x);
-            if(enemy.checkDisplayScore()){ // if exceeding the scoreDisplayLength
-                killedEnemies.remove(enemy); // remove enemy from killedEnemies
+            int[] temp = killedEnemies.get(x);
+            temp[2] --;
+            if(temp[2] == 0){
+                killedEnemies.remove(temp);
             }
         }
-*/
 
-        // spawns enemies; winCon is set when each wave is done
+        ArrayList<Integer> temp = new ArrayList<>();
+
+        // summon new enemies
         for(int j = 0; j < enemySpawnTime[currentWave].size(); j++){
-            long spawn = enemySpawnTime[currentWave].get(j);
-            if(spawn <= timePassedPerWave){
-
-                Random rand = new Random();
-
-                this.summonEnemy(rand.nextInt(5));
-                enemySpawnTime[currentWave].remove((int) j);
-                if(currentWave == enemySpawnTime.length - 1) {
-                    winCon = true;
+            if(j < enemySpawnTime[currentWave].size()) {
+                int spawn = enemySpawnTime[currentWave].get(j);
+                if (spawn <= timePassedPerWave) {
+                    Random rand = new Random();
+                    this.summonEnemy(rand.nextInt(5));
+                    temp.add(spawn);
+                    if (currentWave == enemySpawnTime.length - 1) {
+                        winCon = true;
+                    }
                 }
             }
         }
 
+        //removes enemies from enemySpawnTime[currentWave] to update the enemies being spawned
+        for(int j = 0; j < temp.size(); j++){
+            enemySpawnTime[currentWave].remove(temp.get(j));
+        }
+
+        ArrayList<Spell> tempor = new ArrayList<>();
+        // clear spells
+        for(int i = 0; i < spellsActive.size(); i++){
+            Spell spell = spellsActive.get(i);
+            if(spell.countdownDuration()){
+                tempor.add(spell);
+            }
+        }
+
+        // actually remove the spells in active spells
+        for(int i = 0; i < tempor.size(); i++){
+            spellsActive.remove(tempor.get(i));
+        }
+
+        // game over
         for(int i = 0; i < enemies.size(); i ++){
             Enemy enemy = enemies.get(i);
             if(enemy.getPosX() <= map[enemy.getLane()][0].x - m_BlockSize + m_BlockSize / 2){
@@ -689,34 +808,43 @@ public class MapView extends SurfaceView implements Runnable {
                 break;
             }
         }
+
         if(enemySpawnTime[currentWave].size() == 0 && enemies.size() == 0 && currentWave < enemySpawnTime.length - 1) {
             currentWave++;
             timePassedPerWave = 0;
         }
 
-        else if(currentWave == maxWave - 1 && enemies.size() == 0 && winCon){
+        else if(currentWave == maxWave - 1 && enemies.size() == 0 && winCon && enemySpawnTime[currentWave].size() == 0){
             winner = true;
             //m_Playing = false;
         }
-
     }
+
+
+
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
+                startX = motionEvent.getX();
+                startY = motionEvent.getY();
                 if(winner){
-                    this.destroy();
+                    //this.destroy();
+                    pause();
                     startGame();
                 }
                 else if(gameOver){
-                    this.destroy();
+                    //this.destroy();
+                    pause();
                     startGame();
                 }
                 else if(!m_Playing){
                     m_Playing = true;
                     resume();
                 }
+
+
                 else if(motionEvent.getX() >= Math.round(40 * scale) &&
                         motionEvent.getX() <= Math.round(120 * scale) &&
                         motionEvent.getY() >= Math.round(10 * scale) &&
@@ -727,6 +855,7 @@ public class MapView extends SurfaceView implements Runnable {
                     cursorLocation.y = (int) motionEvent.getY();
                     selectedAlly = "Wizard";
                 }
+
                 else if(motionEvent.getX() >= Math.round(130 * scale) &&
                         motionEvent.getX() <= Math.round(200 * scale) &&
                         motionEvent.getY() >= Math.round(10 * scale) &&
@@ -738,6 +867,7 @@ public class MapView extends SurfaceView implements Runnable {
                     selectedAlly = "Warrior";
                 }
 
+                // pause
                 else if(motionEvent.getX() >= Math.round(580 * scale) &&
                         motionEvent.getX() <= Math.round(610 * scale) &&
                         motionEvent.getY() >= Math.round(20 * scale) &&
@@ -746,6 +876,7 @@ public class MapView extends SurfaceView implements Runnable {
                     drawGame();
                 }
 
+                // fast forward
                 else if(motionEvent.getX() >= Math.round(540 * scale) &&
                         motionEvent.getX() <= Math.round(570 * scale) &&
                         motionEvent.getY() >= Math.round(20 * scale) &&
@@ -756,12 +887,97 @@ public class MapView extends SurfaceView implements Runnable {
                         FPS = 30;
                     drawGame();
                 }
+
+                // fire spell selected from spell list
+                else if(motionEvent.getX() >= m_ScreenWidth - 190 * scale &&
+                        motionEvent.getX() <= m_ScreenWidth - 140 * scale &&
+                        motionEvent.getY() >= m_ScreenHeight + (spellY + 30) * scale &&
+                        motionEvent.getY() <= m_ScreenHeight + (spellY + 80) * scale &&
+                        spellY == -110){ // spell list is active
+                    spellActivated = "Fire";
+                    spellY = 0; // hide spell list to make all blocks accessible
+                }
+
+                // thunder spell selected from spell list
+                else if(motionEvent.getX() >= m_ScreenWidth - 70 * scale &&
+                        motionEvent.getX() <= m_ScreenWidth - 20 * scale &&
+                        motionEvent.getY() >= m_ScreenHeight + (spellY + 30) * scale &&
+                        motionEvent.getY() <= m_ScreenHeight + (spellY + 80) * scale &&
+                        spellY == -110){ // spell list is active
+                    spellActivated = "Thunder";
+                    spellY = 0; // hide spell list to make all blocks accessible
+                }
+
+                // ice spell selected from spell list
+                else if(motionEvent.getX() >= m_ScreenWidth - 130 * scale &&
+                        motionEvent.getX() <= m_ScreenWidth - 80 * scale &&
+                        motionEvent.getY() >= m_ScreenHeight + (spellY + 30) * scale &&
+                        motionEvent.getY() <= m_ScreenHeight + (spellY + 80) * scale &&
+                        spellY == -110){ // spell list is active
+                    spellActivated = "Ice";
+                    spellY = 0; // hide spell list to make all blocks accessible
+                }
+
+                // spell casted
+                else if(!spellActivated.equals("")){
+                    for(int y = 0; y < map.length; y++){
+                        for(int x = 0; x < map[y].length; x++){
+                            // if within map, snap transparent to block
+                            if( motionEvent.getX() >= map[y][x].x &&
+                                motionEvent.getX() <= map[y][x].x + m_BlockSize &&
+                                motionEvent.getY() >= map[y][x].y &&
+                                motionEvent.getY() <= map[y][x].y + m_NumBlocksHigh){ // if within a block inside map
+                                switch(spellActivated){
+                                    case "Fire":
+                                        Fire fire = new Fire();
+                                        m_Score += fire.activateSpell(x, y, enemies, map);
+                                        spellsActive.add(fire);
+                                        spellActivated = "";
+                                        spellY = -10;
+                                        break;
+                                    case "Thunder":
+                                        Thunder thunder = new Thunder();
+                                        m_Score += thunder.activateSpell(x, y, enemies, map);
+                                        spellsActive.add(thunder);
+                                        spellActivated = "";
+                                        spellY = -10;
+                                        break;
+                                    case "Ice":
+                                        Ice ice = new Ice();
+                                        m_Score += ice.activateSpell(enemies, map);
+                                        spellsActive.add(ice);
+                                        spellActivated = "";
+                                        spellY = -10;
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+
                 break;
             case MotionEvent.ACTION_MOVE:
                 cursorLocation.x = (int) motionEvent.getX();
                 cursorLocation.y = (int) motionEvent.getY();
+                if( cursorLocation.y <= startY + 10 * scale && // nakapag-swipe up ka
+                    startX >= m_ScreenWidth - 200 * scale && // within bounds of spell
+                    startX <= m_ScreenWidth - 10 * scale && // within bounds of spell
+                    startY >= m_ScreenHeight - 20 * scale && // kung saan ka nagsimulang mag-drag is within 20dp from the end of the screen
+                    spellY == -10){ // position of spells is hidden
+
+                    spellY = -110;
+                }
+                else if(cursorLocation.y >= startY - 10 * scale &&
+                        startX >= m_ScreenWidth - 200 * scale &&
+                        startX <= m_ScreenWidth - 10 * scale &&
+                        startY >= m_ScreenHeight / 2 &&
+                        spellY == -110){
+                    spellY = -10;
+                }
                 break;
+
             case MotionEvent.ACTION_UP:
+
                 for(int y = 0; y < map.length; y++){
                     for(int x = 0; x < map[y].length; x++){
                         if( motionEvent.getX() >= map[y][x].x &&
@@ -835,6 +1051,7 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapThesis.recycle();
         bitmapCastle.recycle();
         bitmapEnemy.recycle();
+        bitmapMageProjectile.recycle();
         bitmapWizard = null;
         bitmapBackground = null;
         bitmapWizardIcon = null;
@@ -843,5 +1060,7 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapThesis = null;
         bitmapCastle = null;
         bitmapEnemy = null;
+        bitmapMageProjectile = null;
+        pause();
     }
 }

@@ -43,8 +43,14 @@ public abstract class Ally extends Fighter{
                 encounterEnemy(enemy);
             }
         }
-        while(enemies.size() != 0 && enemies.get(0).isDead()){
-            enemies.remove(0);
+        int limit = enemies.size();
+        int i= 0;
+        while(i < limit){
+            if(enemies.get(i).isDead()){
+                enemies.remove(i);
+                limit --;
+            }
+            i ++;
         }
         if (enemies.size() == 0) {
             this.isAttacking = false;
