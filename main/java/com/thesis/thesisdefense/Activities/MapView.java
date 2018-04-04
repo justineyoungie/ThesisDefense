@@ -85,6 +85,10 @@ public class MapView extends SurfaceView implements Runnable {
     private Bitmap bitmapWizardIcon;
     private Bitmap bitmapWarrior;
     private Bitmap bitmapWarriorIcon;
+    private Bitmap bitmapArcher;
+    private Bitmap bitmapArcherIcon;
+    private Bitmap bitmapSpearman;
+    private Bitmap bitmapSpearmanIcon;
     private Bitmap bitmapThesis;
     private Bitmap bitmapCastle;
     private Bitmap bitmapEnemy;
@@ -161,21 +165,29 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapWizard = decodeSampleBitmapFromResource(this.getResources(), R.drawable.mage, 250, 250);
         bitmapWizardIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.mage_icon);
 
+        // warrior
         bitmapWarrior = decodeSampleBitmapFromResource(this.getResources(), R.drawable.knight, 250, 250);
         bitmapWarriorIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.knight_icon);
 
-        bitmapEnemy = decodeSampleBitmapFromResource(this.getResources(), R.drawable.enemy_knight, 250, 250);
+        // archer
+        bitmapArcher = decodeSampleBitmapFromResource(this.getResources(), R.drawable.archer, 250, 250);
+        bitmapArcherIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.archer_icon);
 
-        bitmapCastle = decodeSampleBitmapFromResource(this.getResources(), R.drawable.castle, 150, m_ScreenHeight / 2);
+        // spearman
+        bitmapSpearman = decodeSampleBitmapFromResource(this.getResources(), R.drawable.spearman, 250, 250);
+        bitmapSpearmanIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.spear_icon);
+
+        bitmapEnemy = decodeSampleBitmapFromResource(this.getResources(), R.drawable.enemy_knight, 250, 225);
+
+        bitmapCastle = decodeSampleBitmapFromResource(this.getResources(), R.drawable.castle, 150, 150);
         bitmapThesis = BitmapFactory.decodeResource(this.getResources(), R.drawable.thesis);
 
-        bitmapMageProjectile = BitmapFactory.decodeResource(this.getResources(), R.drawable.mage_projectile);
-        bitmapSpells = BitmapFactory.decodeResource(this.getResources(), R.drawable.spells);
+        bitmapMageProjectile = decodeSampleBitmapFromResource(this.getResources(), R.drawable.mage_projectile, 150, 150);
+        bitmapSpells = decodeSampleBitmapFromResource(this.getResources(), R.drawable.spells, 100, 100);
 
         bitmapFire = BitmapFactory.decodeResource(this.getResources(), R.drawable.spell_fire);
         bitmapIce = BitmapFactory.decodeResource(this.getResources(), R.drawable.spell_ice);
         bitmapThunder = BitmapFactory.decodeResource(this.getResources(), R.drawable.spell_thunder);
-
 
         loadSound();
         // Start the game
@@ -244,6 +256,8 @@ public class MapView extends SurfaceView implements Runnable {
         // temporary instantiation
         new Wizard(0, 0, 0, 0, bitmapWizard, bitmapMageProjectile, 0);
         new Warrior(0, 0, 0, 0, bitmapWarrior, 0);
+        new Archer(0, 0, 0, 0, bitmapArcher, bitmapMageProjectile, 0);
+        new Spearman(0, 0, 0, 0, bitmapSpearman, 0);
 
 
         // Reset the m_Score
@@ -256,19 +270,19 @@ public class MapView extends SurfaceView implements Runnable {
 
 
 
-        allyMap[4][3] = new Warrior(map[4][3].x, map[4][3].y,
+        allyMap[4][3] = new Spearman(map[4][3].x, map[4][3].y,
                 3, 4,
                 bitmapWarrior, scale);
-        allyMap[3][3] = new Warrior(map[3][3].x, map[3][3].y,
+        allyMap[3][3] = new Spearman(map[3][3].x, map[3][3].y,
                 3, 3,
                 bitmapWarrior, scale);
-        allyMap[2][3] = new Warrior(map[2][3].x, map[2][3].y,
+        allyMap[2][3] = new Spearman(map[2][3].x, map[2][3].y,
                 3, 2,
                 bitmapWarrior, scale);
-        allyMap[1][3] = new Warrior(map[1][3].x, map[1][3].y,
+        allyMap[1][3] = new Spearman(map[1][3].x, map[1][3].y,
                 3, 1,
                 bitmapWarrior, scale);
-        allyMap[0][3] = new Warrior(map[0][3].x, map[0][3].y,
+        allyMap[0][3] = new Spearman(map[0][3].x, map[0][3].y,
                 3, 0,
                 bitmapWarrior, scale);
 
@@ -296,7 +310,7 @@ public class MapView extends SurfaceView implements Runnable {
         enemySpawnTime[2].add(16000);
         enemySpawnTime[2].add(21000);
         enemySpawnTime[2].add(23000);
-        enemySpawnTime[2].add(23500);
+        enemySpawnTime[2].add(25000);
 
         resume();
         // Setup m_NextFrameTime so an update is triggered immediately
@@ -527,6 +541,40 @@ public class MapView extends SurfaceView implements Runnable {
 
             m_Paint.reset();
 
+            // archer icon for selection
+            src = new Rect(0, 0, bitmapArcherIcon.getWidth(), bitmapArcherIcon.getHeight());
+            dst = new Rect( Math.round(220*scale),
+                    Math.round(10*scale),
+                    Math.round(290*scale),
+                    Math.round(50*scale));
+
+            if(isSelecting && selectedAlly.equals("Archer") || m_Score < 75){
+                m_Paint.setColorFilter(new LightingColorFilter(0xFF7F7F7F, 0x00000000));
+                m_Canvas.drawBitmap(bitmapArcherIcon, src, dst, m_Paint);
+            }
+            else
+                m_Canvas.drawBitmap(bitmapArcherIcon, src, dst, m_Paint);
+
+
+            m_Paint.reset();
+
+            // spearman icon for selection
+            src = new Rect(0, 0, bitmapSpearmanIcon.getWidth(), bitmapSpearmanIcon.getHeight());
+            dst = new Rect( Math.round(310*scale),
+                            Math.round(10*scale),
+                            Math.round(380*scale),
+                            Math.round(50*scale));
+
+            if(isSelecting && selectedAlly.equals("Spearman") || m_Score < 125){
+                m_Paint.setColorFilter(new LightingColorFilter(0xFF7F7F7F, 0x00000000));
+                m_Canvas.drawBitmap(bitmapSpearmanIcon, src, dst, m_Paint);
+            }
+            else
+                m_Canvas.drawBitmap(bitmapSpearmanIcon, src, dst, m_Paint);
+
+
+            m_Paint.reset();
+
 
             // spell container
             src = new Rect( 0, 0, bitmapSpells.getWidth(), bitmapSpells.getHeight());
@@ -614,6 +662,20 @@ public class MapView extends SurfaceView implements Runnable {
                                     cursorLocation.x + (m_BlockSize + 90) / 2,
                                     cursorLocation.y + m_NumBlocksHigh / 2 + 25);
                 }
+                else if(selectedAlly.equals("Archer")){
+                    src = new Rect(0, 0, Archer.FRAME_WIDTH, Archer.FRAME_HEIGHT);
+                    dst = new Rect( cursorLocation.x - (m_BlockSize + 90) / 2, // to center the image on the cursor
+                                    cursorLocation.y - m_NumBlocksHigh / 2 - 25,
+                                    cursorLocation.x + (m_BlockSize + 90) / 2,
+                                    cursorLocation.y + m_NumBlocksHigh / 2 + 25);
+                }
+                else if(selectedAlly.equals("Spearman")){
+                    src = new Rect(0, 0, Spearman.FRAME_WIDTH, Spearman.FRAME_HEIGHT);
+                    dst = new Rect( cursorLocation.x - (m_BlockSize + 90) / 2, // to center the image on the cursor
+                                    cursorLocation.y - m_NumBlocksHigh / 2 - 25,
+                                    cursorLocation.x + (m_BlockSize + 90) / 2,
+                                    cursorLocation.y + m_NumBlocksHigh / 2 + 25);
+                }
 
                 //check if cursor is within map
                 for(int y = 0; y < map.length; y++){
@@ -637,31 +699,36 @@ public class MapView extends SurfaceView implements Runnable {
                     m_Canvas.drawBitmap(bitmapWizard, src, dst, m_Paint);
                 else if(selectedAlly.equals("Warrior"))
                     m_Canvas.drawBitmap(bitmapWarrior, src, dst, m_Paint);
+                if(selectedAlly.equals("Archer"))
+                    m_Canvas.drawBitmap(bitmapArcher, src, dst, m_Paint);
+                else if(selectedAlly.equals("Spearman"))
+                    m_Canvas.drawBitmap(bitmapSpearman, src, dst, m_Paint);
             }
 
             if(winner){
                 m_Paint.setARGB(60, 0,0,0);
                 m_Canvas.drawRect(0, 0, m_ScreenWidth, m_ScreenHeight, m_Paint);
 
-                m_Paint.setColor(Color.WHITE);
-                m_Paint.setTextAlign(Paint.Align.CENTER);
-                m_Paint.setTextSize(32 * scale);
-                m_Canvas.drawText("YOU DEFENDED THESIS!", m_ScreenWidth / 2, m_ScreenHeight / 2 - 50, m_Paint);
+                Bitmap bitmapVictory = decodeSampleBitmapFromResource(this.getResources(), R.drawable.victory, 250, 100);
+                src = new Rect(0, 0, bitmapVictory.getWidth(), bitmapVictory.getHeight());
+                dst = new Rect( (int)((m_ScreenWidth - 100 * scale) / 2),
+                                (int)((m_ScreenHeight - 50 * scale) / 2),
+                                (int)((m_ScreenWidth + 100 * scale) / 2),
+                                (int)((m_ScreenHeight + 50 * scale) / 2));
+                m_Canvas.drawBitmap(bitmapVictory, src, dst, null);
 
-                m_Paint.setTextSize(20 * scale);
-                m_Canvas.drawText("(Click anywhere to restart level)", m_ScreenWidth / 2, m_ScreenHeight / 2, m_Paint);
             }
             else if(gameOver){
                 m_Paint.setARGB(60, 0,0,0);
                 m_Canvas.drawRect(0, 0, m_ScreenWidth, m_ScreenHeight, m_Paint);
 
-                m_Paint.setColor(Color.WHITE);
-                m_Paint.setTextAlign(Paint.Align.CENTER);
-                m_Paint.setTextSize(32 * scale);
-                m_Canvas.drawText("FAILED TO DEFEND YOUR THESIS!", m_ScreenWidth / 2, m_ScreenHeight / 2 - 50, m_Paint);
-
-                m_Paint.setTextSize(20 * scale);
-                m_Canvas.drawText("(Click anywhere to restart level)", m_ScreenWidth / 2, m_ScreenHeight / 2, m_Paint);
+                Bitmap bitmapDefeat = decodeSampleBitmapFromResource(this.getResources(), R.drawable.defeat, 250, 100);
+                src = new Rect(0, 0, bitmapDefeat.getWidth(), bitmapDefeat.getHeight());
+                dst = new Rect( (int)((m_ScreenWidth - 100 * scale) / 2),
+                                (int)((m_ScreenHeight - 50 * scale) / 2),
+                                (int)((m_ScreenWidth + 100 * scale) / 2),
+                                (int)((m_ScreenHeight + 50 * scale) / 2));
+                m_Canvas.drawBitmap(bitmapDefeat, src, dst, null);
             }
             // if paused, draw the pause screen
             else if(!m_Playing) {
@@ -719,6 +786,16 @@ public class MapView extends SurfaceView implements Runnable {
                                 Projectile proj = ((Wizard) ally).getProjectiles().get(i);
                                 if(proj.hasEncountered()){
                                     ((Wizard) ally).removeProjectile(proj);
+                                }
+                                else
+                                    m_Score += proj.checkContact(enemies);
+                            }
+                        }
+                        else if(ally instanceof Archer){
+                            for(int i = 0; i < ((Archer) ally).getProjectiles().size(); i++){
+                                Projectile proj = ((Archer) ally).getProjectiles().get(i);
+                                if(proj.hasEncountered()){
+                                    ((Archer) ally).removeProjectile(proj);
                                 }
                                 else
                                     m_Score += proj.checkContact(enemies);
@@ -867,6 +944,28 @@ public class MapView extends SurfaceView implements Runnable {
                     selectedAlly = "Warrior";
                 }
 
+                else if(motionEvent.getX() >= Math.round(220 * scale) &&
+                        motionEvent.getX() <= Math.round(290 * scale) &&
+                        motionEvent.getY() >= Math.round(10 * scale) &&
+                        motionEvent.getY() <= Math.round(50 * scale) &&
+                        m_Score >= 50){ // pressed the archer icon
+                    isSelecting = true;
+                    cursorLocation.x = (int) motionEvent.getX();
+                    cursorLocation.y = (int) motionEvent.getY();
+                    selectedAlly = "Archer";
+                }
+
+                else if(motionEvent.getX() >= Math.round(310 * scale) &&
+                        motionEvent.getX() <= Math.round(380 * scale) &&
+                        motionEvent.getY() >= Math.round(10 * scale) &&
+                        motionEvent.getY() <= Math.round(50 * scale) &&
+                        m_Score >= 50){ // pressed the spearman icon
+                    isSelecting = true;
+                    cursorLocation.x = (int) motionEvent.getX();
+                    cursorLocation.y = (int) motionEvent.getY();
+                    selectedAlly = "Spearman";
+                }
+
                 // pause
                 else if(motionEvent.getX() >= Math.round(580 * scale) &&
                         motionEvent.getX() <= Math.round(610 * scale) &&
@@ -993,6 +1092,14 @@ public class MapView extends SurfaceView implements Runnable {
                             else if(selectedAlly.equals("Warrior")) {
                                 allyMap[y][x] = new Warrior(map[y][x].x, map[y][x].y, x, y, bitmapWarrior, scale);
                                 m_Score -= 50;
+                            }
+                            else if(selectedAlly.equals("Archer")) {
+                                allyMap[y][x] = new Archer(map[y][x].x, map[y][x].y, x, y, bitmapArcher, bitmapMageProjectile, scale);
+                                m_Score -= 75;
+                            }
+                            else if(selectedAlly.equals("Spearman")) {
+                                allyMap[y][x] = new Spearman(map[y][x].x, map[y][x].y, x, y, bitmapSpearman, scale);
+                                m_Score -= 125;
                             }
                         }
                     }

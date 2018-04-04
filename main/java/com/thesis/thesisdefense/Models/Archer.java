@@ -7,10 +7,10 @@ import com.thesis.thesisdefense.Activities.MapView;
 import java.util.ArrayList;
 
 /**
- * Created by justine on 3/10/18.
+ * Created by justine on 4/4/18.
  */
 
-public class Wizard extends Ally{
+public class Archer extends Ally {
 
     public static int FRAME_WIDTH;
     public static int FRAME_HEIGHT;
@@ -18,10 +18,10 @@ public class Wizard extends Ally{
     private ArrayList<Projectile> projectiles;
     private Bitmap projImage;
 
-    public Wizard(int posX, int poxY, int indexX, int indexY, Bitmap image, Bitmap projImage, float scale) {
+    public Archer(int posX, int poxY, int indexX, int indexY, Bitmap image, Bitmap projImage, float scale) {
         super(posX, poxY, 5, 1, 1000, indexX, indexY,
-                477, 484, image, scale,
-                8, 8, 7);
+                485, 493, image, scale,
+                8, 7, 7);
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.incrementY;
         this.projImage = projImage;
@@ -48,5 +48,4 @@ public class Wizard extends Ally{
     public ArrayList<Projectile> getProjectiles(){ return projectiles; }
 
     public void removeProjectile(Projectile projectile){ projectiles.remove(projectile); }
-
 }
