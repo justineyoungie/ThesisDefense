@@ -23,7 +23,11 @@ public class Main extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+<<<<<<< HEAD
         setContentView(R.layout.activity_nickname);
+=======
+        setContentView(R.layout.activity_main);
+>>>>>>> 0ada1ed537ed0bdfc0f5a15b5bc4e3ecd5ef18d6
 
         logo = this.findViewById(R.id.image_logo);
         touch = this.findViewById(R.id.text_touch);
@@ -49,10 +53,18 @@ public class Main extends AppCompatActivity{
     }
 
     @Override
+<<<<<<< HEAD
     public boolean onTouchEvent(MotionEvent motionEvent) {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 Intent intent = new Intent(this, Menu.class);
+=======
+
+    public boolean onTouchEvent(MotionEvent motionEvent) {
+        switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_DOWN:
+                Intent intent = new Intent(this, Nickname.class);
+>>>>>>> 0ada1ed537ed0bdfc0f5a15b5bc4e3ecd5ef18d6
                 this.startActivity(intent);
                 break;
         }
