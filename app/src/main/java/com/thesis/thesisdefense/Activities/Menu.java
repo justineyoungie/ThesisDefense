@@ -55,7 +55,7 @@ public class Menu extends AppCompatActivity{
         });
 
         Button upgradesBtn = this.findViewById(R.id.button_upgrade);
-        creditsBtn.setOnClickListener(new View.OnClickListener() {
+        upgradesBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(Menu.this, UpgradeShop.class);
