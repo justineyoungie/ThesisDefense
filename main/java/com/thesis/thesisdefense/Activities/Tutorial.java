@@ -133,8 +133,9 @@ public class Tutorial extends SurfaceView implements Runnable {
 
 
     //Variables for Tutorial//
-        private boolean tutorialPass;
+        private boolean tutorialPass1;
         private boolean canSwitchScene = true;
+        private  boolean tutorialPass2;
     /////
     public Tutorial(Context context, Point size) {
         super(context);
@@ -232,8 +233,10 @@ public class Tutorial extends SurfaceView implements Runnable {
         // temporary instantiation
         Wizard wizard = new Wizard(0, 0, 0, 0, bitmapWizard, bitmapMageProjectile, scale,m_BlockSize,m_ScreenWidth);
         wizard = null;
+        Warrior warrior = new Warrior(0,0,0,0, bitmapWarrior, scale);
+        warrior = null;
         // Reset the m_Score
-        m_Score = 150;
+        m_Score = 50;
 
         // initialize the spawn times
 
@@ -456,7 +459,7 @@ public class Tutorial extends SurfaceView implements Runnable {
             m_Canvas.drawText("Coins: " + m_Score, (int) 460 * scale, (int)40 * scale, m_Paint);
 
 
-            m_Canvas.drawText("Tutorial: " + (scene) + "/5", (int) 380 * scale, (int)40 * scale, m_Paint);
+            m_Canvas.drawText("Tutorial: " + (scene) + "/5 ", (int) 380 * scale, (int)40 * scale, m_Paint);
 
             m_Paint.reset();
             //pause button
@@ -504,7 +507,7 @@ public class Tutorial extends SurfaceView implements Runnable {
                     Math.round(200*scale),
                     Math.round(50*scale));
 
-            if(isSelecting && selectedAlly.equals("Warrior") || m_Score < 50){
+            if(isSelecting && selectedAlly.equals("Warrior") || m_Score < 50 || scene == 5 || scene == 4){
                 m_Paint.setColorFilter(new LightingColorFilter(0xFF7F7F7F, 0x00000000));
                 m_Canvas.drawBitmap(bitmapWarriorIcon, src, dst, m_Paint);
             }
@@ -701,7 +704,9 @@ public class Tutorial extends SurfaceView implements Runnable {
                 setScene();
 
             }
-            updateScene();
+            if(waitTime <= 0) {
+                updateScene();
+            }
 
         }
 
@@ -739,7 +744,8 @@ public class Tutorial extends SurfaceView implements Runnable {
                         motionEvent.getX() <= Math.round(200 * scale) &&
                         motionEvent.getY() >= Math.round(10 * scale) &&
                         motionEvent.getY() <= Math.round(50 * scale) &&
-                        m_Score >= 50){ // pressed the warrior icon
+                        m_Score >= 50 &&
+                        (scene != 5 && scene != 4)){ // pressed the warrior icon
                     isSelecting = true;
                     cursorLocation.x = (int) motionEvent.getX();
                     cursorLocation.y = (int) motionEvent.getY();
@@ -862,7 +868,8 @@ public class Tutorial extends SurfaceView implements Runnable {
         scene = 0;
         dialogTextSize = 50;
         canSwitchScene = true;
-
+        tutorialPass1 = false;
+        tutorialPass2 = false;
     }
     public void setScene(){
         canSwitchScene = false;
@@ -872,30 +879,72 @@ public class Tutorial extends SurfaceView implements Runnable {
             dialogtexts.add("Hello there! I see you are here to defend your thesis");
             dialogtexts.add("First off to defend your thesis, You have to form a good team");
             dialogtexts.add("Drag an drop units from the upper left screen to the field to prepare to defend your thesis");
-            dialogTextSize = 50;
+            dialogTextSize = 30;
 
         }
-        else{
+        else if(scene == 2){
             dialogtexts = new ArrayList<>();
-            dialogtexts.add("Testing mothafaka bitch");
-
+            dialogtexts.add("Here comes the panelists!");
+            waitTime = 20;
         }
-
+        else if(scene == 3){
+            dialogtexts = new ArrayList<>();
+            dialogtexts.add("One of your team is about to face the panel");
+            dialogtexts.add("Get ready!");
+            for(int i = 0 ; i < allyMap.length; i++){
+                for(int j = 0; j < allyMap[i].length; j++){
+                    if(allyMap[i][j] != null){
+                        summonEnemy(i);
+                    }
+                }
+            }
+            waitTime = 20;
+        }
+        else if(scene == 4){
+            dialogtexts = new ArrayList<>();
+            dialogtexts.add("Congratulations!");
+            dialogtexts.add("Your team has defended your thesis from a panel!");
+            m_Score = 100;
+            waitTime = 20;
+        }
+        else if(scene == 5){
+            dialogtexts = new ArrayList<>();
+            dialogtexts.add("Lets have more groupmates to help");
+            dialogtexts.add("with our documentation");
+        }
+        else if(scene == 6){
+            dialogtexts = new ArrayList<>();
+            dialogtexts.add("More panelists are comming");
+            waitTime = 30;
+        }
+        else if(scene == 7){
+            dialogtexts = new ArrayList<>();
+            dialogtexts.add("One of your team is about to face the panel");
+            dialogtexts.add("Get ready!");
+            for(int i = 0 ; i < allyMap.length; i++){
+                for(int j = 0; j < allyMap[i].length; j++){
+                    if(allyMap[i][j] != null){
+                        summonEnemy(i);
+                    }
+                }
+            }
+            waitTime = 40;
+        }
     }
     public void updateScene(){
         if(scene == 1){
-            if(!tutorialPass) {
+            if(!tutorialPass1) {
                 for (int i = 0; i < allyMap.length; i++) {
                     for (int j = 0; j < allyMap[i].length; j++) {
                         if (allyMap[i][j] != null) {
-                            tutorialPass = true;
+                            tutorialPass1 = true;
                         }
                     }
                 }
 
-                if (tutorialPass) {
+                if (tutorialPass1) {
                     dialogtexts = null;
-                    waitTime = 50;
+                    waitTime = 30;
 
                 }
             }
@@ -903,5 +952,55 @@ public class Tutorial extends SurfaceView implements Runnable {
                 canSwitchScene = true;
             }
         }
+        else if(scene == 2){
+                dialogtexts = null;
+                canSwitchScene = true;
+        }
+        else if(scene == 3){
+            dialogtexts = null;
+
+            if(enemies.size() == 0){
+               canSwitchScene = true;
+            }
+        }
+        else if(scene == 4){
+            dialogtexts = null;
+            canSwitchScene = true;
+        }
+        else if(scene == 5){
+            if(!tutorialPass2) {
+                int count = 0;
+                for (int i = 0; i < allyMap.length; i++) {
+                    for (int j = 0; j < allyMap[i].length; j++) {
+                        if (allyMap[i][j] != null) {
+                            count++;
+                            if(count == 2)
+                                tutorialPass2 = true;
+                        }
+                    }
+                }
+
+                if (tutorialPass2) {
+                    dialogtexts = null;
+                    waitTime = 30;
+
+                }
+            }
+            else{
+                canSwitchScene = true;
+            }
+        }
+        else if(scene == 6){
+            dialogtexts = null;
+            canSwitchScene = true;
+        }
+        else if(scene == 7){
+            dialogtexts = null;
+
+            if(enemies.size() == 0){
+                canSwitchScene = true;
+            }
+        }
+
     }
 }
