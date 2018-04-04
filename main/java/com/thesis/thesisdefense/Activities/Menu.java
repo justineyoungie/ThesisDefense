@@ -27,7 +27,7 @@ public class Menu extends AppCompatActivity{
     }
 
     private void setupUI() {
-        Button storyBtn = this.findViewById(R.id.button_newstory);
+        Button storyBtn = (Button) this.findViewById(R.id.button_newstory);
         storyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -36,7 +36,7 @@ public class Menu extends AppCompatActivity{
             }
         });
 
-        Button challengeBtn = this.findViewById(R.id.button_challenge);
+        Button challengeBtn = (Button) this.findViewById(R.id.button_challenge);
         challengeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -45,7 +45,7 @@ public class Menu extends AppCompatActivity{
             }
         });
 
-        Button creditsBtn = this.findViewById(R.id.button_credits);
+        Button creditsBtn = (Button) this.findViewById(R.id.button_credits);
         creditsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,5 +54,13 @@ public class Menu extends AppCompatActivity{
             }
         });
 
+        Button upgradesBtn = (Button) this.findViewById(R.id.button_upgrade);
+        upgradesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Intent i = new Intent(Menu.this, UpgradeShop.class);
+                //startActivity(i);
+            }
+        });
     }
 }

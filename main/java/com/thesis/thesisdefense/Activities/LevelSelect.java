@@ -23,90 +23,49 @@ public class LevelSelect extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_levelselect);
 
+       this.setupUI();
+    }
+
+  private void setupUI() {
+        Button easyBtn = (Button) this.findViewById(R.id.btn_easy);
+        easyBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(LevelSelect.this, Level.class);
+                i.putExtra("TAG" , "Easy");
+                startActivity(i);
+            }
+        });
+
+        Button mediumBtn = (Button) this.findViewById(R.id.btn_medium);
+        mediumBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(LevelSelect.this, Level.class);
+                i.putExtra("TAG","Moderate");
+                startActivity(i);
+            }
+        });
+
+        Button hardBtn = (Button) this.findViewById(R.id.btn_hard);
+        hardBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(LevelSelect.this, Level.class);
+                i.putExtra("TAG","Difficult");
+                startActivity(i);
+            }
+        });
+
+        Button tutorialBtn = (Button) this.findViewById(R.id.btn_tutorial);
+        tutorialBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(LevelSelect.this, Tutorial.class);
+                startActivity(i);
+            }
+        });
 
     }
 
- /*   private void setupUI() {
-        Button level1btn = this.findViewById(R.id.button_lvl1);
-        level1btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Menu.this, LevelSelect.class);
-                startActivity(i);
-            }
-        });
-        Button level2btn = this.findViewById(R.id.button_lvl2);
-        level1btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Menu.this, LevelSelect.class);
-                startActivity(i);
-            }
-        });
-        Button level3btn = this.findViewById(R.id.button_lvl3);
-        level1btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Menu.this, LevelSelect.class);
-                startActivity(i);
-            }
-        });
-        Button level4btn = this.findViewById(R.id.button_lvl4);
-        level1btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Menu.this, LevelSelect.class);
-                startActivity(i);
-            }
-        });
-        Button level5btn = this.findViewById(R.id.button_lvl5);
-        level1btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Menu.this, LevelSelect.class);
-                startActivity(i);
-            }
-        });
-        Button level6btn = this.findViewById(R.id.button_lvl6);
-        level1btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Menu.this, LevelSelect.class);
-                startActivity(i);
-            }
-        });
-        Button level7btn = this.findViewById(R.id.button_lvl7);
-        level1btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Menu.this, LevelSelect.class);
-                startActivity(i);
-            }
-        });
-        Button level8btn = this.findViewById(R.id.button_lvl8);
-        level1btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Menu.this, LevelSelect.class);
-                startActivity(i);
-            }
-        });
-        Button level9btn = this.findViewById(R.id.button_lvl9);
-        level1btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Menu.this, LevelSelect.class);
-                startActivity(i);
-            }
-        });
-        Button level10btn = this.findViewById(R.id.button_lvl10);
-        level1btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Menu.this, LevelSelect.class);
-                startActivity(i);
-            }
-        });
-    }
-    */
 }

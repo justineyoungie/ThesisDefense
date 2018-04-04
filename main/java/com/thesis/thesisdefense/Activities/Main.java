@@ -15,6 +15,8 @@ import android.widget.TextView;
 
 import com.thesis.thesisdefense.R;
 
+import org.w3c.dom.Text;
+
 public class Main extends AppCompatActivity{
 
     private ImageView logo;
@@ -49,10 +51,11 @@ public class Main extends AppCompatActivity{
     }
 
     @Override
+
     public boolean onTouchEvent(MotionEvent motionEvent) {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                Intent intent = new Intent(this, Level.class);
+                Intent intent = new Intent(Main.this, Menu.class);
                 this.startActivity(intent);
                 break;
         }
