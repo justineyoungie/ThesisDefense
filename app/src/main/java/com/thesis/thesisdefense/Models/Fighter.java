@@ -57,6 +57,23 @@ public abstract class Fighter extends Drawable {
         this.pauseCountdown = attackPause;
         this.range = range;
     }
+    public Fighter(int posX, int poxY, int maxHealth, int damage, int incrementX, int incrementY,
+                   Bitmap image, float scale, int idleFrames, int attackFrames, long attackPause, double range, int AllowanceX) {
+        super(posX, poxY, image, scale, AllowanceX);
+        this.maxHealth = maxHealth;
+        this.currentHealth = maxHealth;
+        this.damage = damage;
+        this.incrementX = incrementX;
+        this.incrementY = incrementY;
+        this.currentFrame = new Point(incrementX, incrementY);
+
+        this.idleFrameEnd = image.getWidth() - (8 - idleFrames) * incrementX;
+        this.attackFrameEnd = image.getWidth() - (8 - attackFrames) * incrementX;
+
+        this.attackPause = attackPause;
+        this.pauseCountdown = attackPause;
+        this.range = range;
+    }
 
     /**
      * Subtracts damage to current health of fighter
@@ -204,4 +221,9 @@ public abstract class Fighter extends Drawable {
     public int getIdleFrameEnd() {return idleFrameEnd; };
 
     public int getAttackFrameEnd() {return  attackFrameEnd; };
+
+    public void setGodMode(){
+        this.maxHealth = Integer.MAX_VALUE;
+        this.currentHealth = Integer.MAX_VALUE;
+    }
 }

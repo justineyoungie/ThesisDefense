@@ -12,9 +12,185 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-smallcaps"
         android:text="Select Upgrades"
-        tools:layout_editor_absoluteX="245dp"
-        tools:layout_editor_absoluteY="32dp" />
+        android:textSize="20sp"
+        tools:layout_editor_absoluteX="223dp"
+        tools:layout_editor_absoluteY="30dp" />
+
+    <Button
+        android:id="@+id/btn_warlvl1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Level 1"
+        tools:layout_editor_absoluteX="70dp"
+        tools:layout_editor_absoluteY="113dp" />
+
+    <Button
+        android:id="@+id/btn_warlvl2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Level 2"
+        tools:layout_editor_absoluteX="70dp"
+        tools:layout_editor_absoluteY="177dp" />
+
+    <Button
+        android:id="@+id/btn_warlvl3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Level 3"
+        tools:layout_editor_absoluteX="70dp"
+        tools:layout_editor_absoluteY="244dp" />
+
+    <Button
+        android:id="@+id/btn_wizlvl1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Level 1"
+        tools:layout_editor_absoluteX="190dp"
+        tools:layout_editor_absoluteY="113dp" />
+
+    <Button
+        android:id="@+id/btn_wizlvl2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Level 2"
+        tools:layout_editor_absoluteX="190dp"
+        tools:layout_editor_absoluteY="177dp" />
+
+    <Button
+        android:id="@+id/btn_wizlvl3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="level 3"
+        tools:layout_editor_absoluteX="190dp"
+        tools:layout_editor_absoluteY="244dp" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Warrior"
+        tools:layout_editor_absoluteX="85dp"
+        tools:layout_editor_absoluteY="77dp" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="17dp"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Wizard"
+        tools:layout_editor_absoluteX="215dp"
+        tools:layout_editor_absoluteY="77dp" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="57dp"
+        android:layout_height="17dp"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Archer"
+        tools:layout_editor_absoluteX="327dp"
+        tools:layout_editor_absoluteY="77dp" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Spearman"
+        tools:layout_editor_absoluteX="443dp"
+        tools:layout_editor_absoluteY="77dp" />
+
+    <Button
+        android:id="@+id/btn_arclvl1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Level 1"
+        tools:layout_editor_absoluteX="311dp"
+        tools:layout_editor_absoluteY="113dp" />
+
+    <Button
+        android:id="@+id/btn_arclvl2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="level 2"
+        tools:layout_editor_absoluteX="311dp"
+        tools:layout_editor_absoluteY="177dp" />
+
+    <Button
+        android:id="@+id/btn_arclvl3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="level 3"
+        tools:layout_editor_absoluteX="311dp"
+        tools:layout_editor_absoluteY="244dp" />
+
+    <Button
+        android:id="@+id/btn_spelvl1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="level 1"
+        tools:layout_editor_absoluteX="428dp"
+        tools:layout_editor_absoluteY="113dp" />
+
+    <Button
+        android:id="@+id/btn_spelvl2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="level 2"
+        tools:layout_editor_absoluteX="428dp"
+        tools:layout_editor_absoluteY="177dp" />
+
+    <Button
+        android:id="@+id/btn_spelvl3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="level 3"
+        tools:layout_editor_absoluteX="428dp"
+        tools:layout_editor_absoluteY="244dp" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Coins:"
+        tools:layout_editor_absoluteX="70dp"
+        tools:layout_editor_absoluteY="38dp" />
+
+    <TextView
+        android:id="@+id/coins_amount"
+        android:layout_width="wrap_content"
+        android:fontFamily="sans-serif-smallcaps"
+        android:layout_height="wrap_content"
+        android:text="AMOUNT"
+        tools:layout_editor_absoluteX="117dp"
+        tools:layout_editor_absoluteY="38dp" />
 
 
 </android.support.constraint.ConstraintLayout>
