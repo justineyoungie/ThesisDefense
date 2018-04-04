@@ -1,8 +1,11 @@
 package com.thesis.thesisdefense.Models;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import java.util.ArrayList;
+
+import static com.thesis.thesisdefense.Activities.MapView.TAG;
 
 /**
  * Created by justine on 3/5/18.
@@ -21,32 +24,58 @@ public abstract class Ally extends Fighter{
     */
 
     public Ally(int posX, int poxY, int maxHealth, int damage, long attackPause,
-                int indexX, int indexY, Bitmap image, float scale, int idleFrame,
-                int numberOfFrames, double range) {
-        super(posX, poxY, maxHealth, damage, image, scale, idleFrame, numberOfFrames, attackPause, range);
+                int indexX, int indexY, int incrementX, int incrementY,
+                Bitmap image, float scale, int idleFrames,
+                int attackFrames, double range) {
+        super(posX, poxY, maxHealth, damage, incrementX, incrementY,image, scale, idleFrames, attackFrames, attackPause, range);
         this.indexX = indexX;
         this.indexY = indexY;
         enemies = new ArrayList<>();
     }
 
-    public void updateAlly(){
-        while(enemies.size() != 0 && enemies.get(0).getCurrentHealth() == 0){
-            enemies.remove(0);
+    public Ally(int posX, int poxY, int maxHealth, int damage, long attackPause,
+                int indexX, int indexY, int incrementX, int incrementY,
+                Bitmap image, float scale, int idleFrames,
+                int attackFrames, double range, int AllowanceX) {
+        super(posX, poxY, maxHealth, damage, incrementX, incrementY,image, scale, idleFrames, attackFrames, attackPause, range,AllowanceX);
+        this.indexX = indexX;
+        this.indexY = indexY;
+        enemies = new ArrayList<>();
+    }
+    // returns 0 if no enemy was killed, returns the score of the enemy killed if otherwise
+    public int updateAlly(ArrayList<Enemy> curEnemies, int m_BlockSize){
+        nextFrame();
+        for(int i = 0; i < curEnemies.size(); i++){
+            Enemy enemy = curEnemies.get(i);
+            if(!enemies.contains(enemy) && enemy.LaneY == indexY && enemy.getCurrentHealth() != 0 &&
+                    enemy.getPosX() <= this.posX+m_BlockSize*range+30 && enemy.getPosX() + (m_BlockSize + 90) / 2 > this.posX + 30){
+                encounterEnemy(enemy);
+            }
+        }
+        int limit = enemies.size();
+        int i= 0;
+        while(i < limit){
+
+            if(enemies.get(i).isDead()){
+                enemies.remove(i);
+                limit --;
+            }
+            i ++;
         }
         if (enemies.size() == 0) {
             this.isAttacking = false;
         }
         else {
-            if(!this.isAttacking){
-                this.isAttacking = true;
-            }
-            if(this.kill){
-                int eHealth = enemies.get(0).takeDamage(this.damage); //get health after current dmg, idk wat to do with it xd it was handled by the loop
-                kill = false;
-            }
+            return this.attackEnemy();
         }
+        return 0;
     }
     public void encounterEnemy(Enemy enemy){ //when enemy is in range,
         enemies.add(enemy);
     }
+
+    public abstract int attackEnemy();
+
+    public ArrayList<Enemy> getEnemies() { return enemies; }
+
 }

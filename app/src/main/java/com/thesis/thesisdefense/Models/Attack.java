@@ -9,6 +9,4 @@ public class Attack extends Drawable {
     {
         super(posX, poxY, image, scale);
     }
-
-
 }

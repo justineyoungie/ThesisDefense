@@ -11,19 +11,30 @@ import android.graphics.Bitmap;
  * Literally anything drawable in the Canvas
  */
 
-public abstract class Drawable extends Object {
+public abstract class   Drawable extends Object {
     protected int posX;
     protected int posY;
     protected int sizeX;
     protected int sizeY;
     protected Bitmap image;
-
+    protected float scale;
+    protected int AllowanceX = 0;
     public Drawable(int posX, int posY, Bitmap image, float scale) {
         this.posX = posX;
         this.posY = posY;
         this.sizeX = (int) (image.getWidth() * scale);
         this.sizeY = (int) (image.getHeight() * scale);
         this.image = image;
+        this.scale = scale;
+    }
+    public Drawable(int posX, int posY, Bitmap image, float scale, int AllowanceX) {
+        this.posX = posX;
+        this.posY = posY;
+        this.sizeX = (int) (image.getWidth() * scale);
+        this.sizeY = (int) (image.getHeight() * scale);
+        this.image = image;
+        this.scale = scale;
+        this.AllowanceX =AllowanceX;
     }
 
     public int getPosX() {
@@ -48,4 +59,5 @@ public abstract class Drawable extends Object {
 
     public Bitmap getImage() { return image; }
 
+    public int getAllowanceX(){ return AllowanceX; }
 }
