@@ -137,6 +137,7 @@ public class MapView extends SurfaceView implements Runnable {
     private String spellActivated = "";
     private ArrayList<Spell> spellsActive;
 
+    private boolean fastforward = false;
 
     public MapView(Context context, Point size) {
         super(context);
@@ -190,9 +191,19 @@ public class MapView extends SurfaceView implements Runnable {
         // You could also extend the code to provide a pause feature
         while (m_Playing) {
             // Update 10 times a second
-            if(checkForUpdate()) {
+            try {
+                if(!fastforward)
+                    Thread.sleep(100);
+                else{
+                    Thread.sleep(30);
+                }
+                //if(checkForUpdate()) {
                 updateGame();
                 drawGame();
+                //}
+            }
+            catch (Exception e){
+
             }
         }
     }
@@ -433,7 +444,7 @@ public class MapView extends SurfaceView implements Runnable {
                         else
                             m_Paint.reset();
                         src = new Rect((ally.getCurrentFrame().x - ally.getIncrementX()), ally.getCurrentFrame().y - ally.getIncrementY(), ally.getCurrentFrame().x, ally.getCurrentFrame().y);
-                        dst = new Rect( map[y][x].x,
+                        dst = new Rect( ally.getPosX() - ally.getAllowanceX(),
                                 map[y][x].y - 50,
                                 map[y][x].x + m_BlockSize + 90,
                                 map[y][x].y + m_NumBlocksHigh);
@@ -487,7 +498,7 @@ public class MapView extends SurfaceView implements Runnable {
                     Math.round(20 * scale),
                     Math.round(m_ScreenWidth - 70 * scale),
                     Math.round(50 * scale));
-            if(FPS == 30)
+            if(fastforward)
                 m_Paint.setColorFilter(new LightingColorFilter(0xFF7F7F7F, 0x00000000));
             m_Canvas.drawBitmap(ff, src, dst, m_Paint);
 
@@ -600,6 +611,7 @@ public class MapView extends SurfaceView implements Runnable {
 
             // if user is dragging an ally from the options to the map
             if(isSelecting){
+                int imgsubtract = 0;
                 if(selectedAlly.equals("Wizard")) {
                     src = new Rect(0, 0, Wizard.FRAME_WIDTH, Wizard.FRAME_HEIGHT);
                     dst = new Rect( cursorLocation.x - (m_BlockSize + 90) / 2, // to center the image on the cursor
@@ -608,8 +620,9 @@ public class MapView extends SurfaceView implements Runnable {
                                     cursorLocation.y + (m_NumBlocksHigh) / 2 + 25);
                 }
                 else if(selectedAlly.equals("Warrior")){
+                    imgsubtract = 30;
                     src = new Rect(0, 0, Warrior.FRAME_WIDTH, Warrior.FRAME_HEIGHT);
-                    dst = new Rect( cursorLocation.x - (m_BlockSize + 90) / 2, // to center the image on the cursor
+                    dst = new Rect( cursorLocation.x - (m_BlockSize + 90) / 2 - imgsubtract, // to center the image on the cursor
                                     cursorLocation.y - m_NumBlocksHigh / 2 - 25,
                                     cursorLocation.x + (m_BlockSize + 90) / 2,
                                     cursorLocation.y + m_NumBlocksHigh / 2 + 25);
@@ -624,7 +637,7 @@ public class MapView extends SurfaceView implements Runnable {
                             cursorLocation.y >= map[y][x].y &&
                             cursorLocation.y <= map[y][x].y + m_NumBlocksHigh &&
                             allyMap[y][x] == null){ // if within a block inside map and has no one occupying it
-                            dst = new Rect( map[y][x].x, // to center the image on the cursor
+                            dst = new Rect( map[y][x].x - imgsubtract, // to center the image on the cursor
                                             map[y][x].y - 50,
                                             map[y][x].x + m_BlockSize + 90,
                                             map[y][x].y + m_NumBlocksHigh);
@@ -767,13 +780,15 @@ public class MapView extends SurfaceView implements Runnable {
         // summon new enemies
         for(int j = 0; j < enemySpawnTime[currentWave].size(); j++){
             if(j < enemySpawnTime[currentWave].size()) {
-                int spawn = enemySpawnTime[currentWave].get(j);
-                if (spawn <= timePassedPerWave) {
-                    Random rand = new Random();
-                    this.summonEnemy(rand.nextInt(5));
-                    temp.add(spawn);
-                    if (currentWave == enemySpawnTime.length - 1) {
-                        winCon = true;
+                if(enemySpawnTime[currentWave] != null) {
+                    int spawn = enemySpawnTime[currentWave].get(j);
+                    if (spawn <= timePassedPerWave) {
+                        Random rand = new Random();
+                        this.summonEnemy(rand.nextInt(5));
+                        temp.add(spawn);
+                        if (currentWave == enemySpawnTime.length - 1) {
+                            winCon = true;
+                        }
                     }
                 }
             }
@@ -881,10 +896,10 @@ public class MapView extends SurfaceView implements Runnable {
                         motionEvent.getX() <= Math.round(570 * scale) &&
                         motionEvent.getY() >= Math.round(20 * scale) &&
                         motionEvent.getY() <= Math.round(50 * scale)){
-                    if(FPS == 30)
-                        FPS = 10;
+                    if(fastforward)
+                        fastforward = false;
                     else
-                        FPS = 30;
+                        fastforward = true;
                     drawGame();
                 }
 
