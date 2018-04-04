@@ -54,19 +54,22 @@ public class Projectile extends Drawable{
     }
 
     //for enemies with projectiles
-    public int checkContact(Ally[][] allyMap){
+    public void checkContact(Ally[][] allyMap){
         posX -= speed;
         for(int y = 0; y < allyMap.length; y++){
             for(int x = 0; x < allyMap[y].length; x++){
                 Ally ally = allyMap[y][x];
                 if( this.posX <= ally.posX + m_blockSize+ 90 &&
                     ally.posX + (m_blockSize + 90) / 2 >= this.posX + width / 2){
-                    ((Enemy) launcher).encounterAlly(ally);
-                    hasEncountered = true;
+                    if(((Ally) launcher).getEnemies().size() != 0) {
+                        hasEncountered = true;
+                        if(((Enemy) launcher).Rival.calculateDamage(launcher.getDamage())){
+                            ((Enemy) launcher).Rival = null;
+                        }
+                    }
                 }
             }
         }
-        return 0;
     }
 
     public boolean hasEncountered(){

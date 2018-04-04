@@ -29,7 +29,7 @@ public class Level extends AppCompatActivity {
         GameDBhelper dbhelper = new GameDBhelper(this);
 
         // Create a new View based on the SnakeView class
-        mapView = new MapView(this, size, dbhelper);
+        mapView = new MapView(this, size, "Easy",dbhelper);
 
         // Make snakeView the default view of the Activity
         setContentView(mapView);
