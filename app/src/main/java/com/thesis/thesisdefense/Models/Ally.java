@@ -33,6 +33,15 @@ public abstract class Ally extends Fighter{
         enemies = new ArrayList<>();
     }
 
+    public Ally(int posX, int poxY, int maxHealth, int damage, long attackPause,
+                int indexX, int indexY, int incrementX, int incrementY,
+                Bitmap image, float scale, int idleFrames,
+                int attackFrames, double range, int AllowanceX) {
+        super(posX, poxY, maxHealth, damage, incrementX, incrementY,image, scale, idleFrames, attackFrames, attackPause, range,AllowanceX);
+        this.indexX = indexX;
+        this.indexY = indexY;
+        enemies = new ArrayList<>();
+    }
     // returns 0 if no enemy was killed, returns the score of the enemy killed if otherwise
     public int updateAlly(ArrayList<Enemy> curEnemies, int m_BlockSize){
         nextFrame();
@@ -43,8 +52,15 @@ public abstract class Ally extends Fighter{
                 encounterEnemy(enemy);
             }
         }
-        while(enemies.size() != 0 && enemies.get(0).isDead()){
-            enemies.remove(0);
+        int limit = enemies.size();
+        int i= 0;
+        while(i < limit){
+
+            if(enemies.get(i).isDead()){
+                enemies.remove(i);
+                limit --;
+            }
+            i ++;
         }
         if (enemies.size() == 0) {
             this.isAttacking = false;

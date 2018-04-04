@@ -23,7 +23,7 @@ public class Main extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_nickname);
 
         logo = this.findViewById(R.id.image_logo);
         touch = this.findViewById(R.id.text_touch);
