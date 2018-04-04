@@ -17,7 +17,6 @@ public class GameDBhelper extends SQLiteOpenHelper {
     public static final String COL_2 = "levelsCleared";
     public static final String COL_3 = "playerName";
     public static final String COL_4 = "Points";
-    private SQLiteDatabase db;
     public GameDBhelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
     }
@@ -26,7 +25,7 @@ public class GameDBhelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String sqlCommand = "CREATE TABLE "+TABLE_NAME+" ("+COL_1+" INTEGER,"+COL_2+" INTEGER, "+COL_3+" TEXT,"+COL_4+" INTEGER);"; //queries in SQl not mySQL
         db.execSQL(sqlCommand);
-        initializeDB();
+        initializeDB(db);
 
     }
 
@@ -38,8 +37,7 @@ public class GameDBhelper extends SQLiteOpenHelper {
     }
 
 
-    public void initializeDB(){
-        SQLiteDatabase db = this.getWritableDatabase();
+    public void initializeDB(SQLiteDatabase db){
         ContentValues cv = new ContentValues();
         cv.put(COL_1, 1);
         cv.put(COL_2, 0);
@@ -49,28 +47,35 @@ public class GameDBhelper extends SQLiteOpenHelper {
     }
 
     public void updateLevel(int level){
+        SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COL_2, level);
         db.update(TABLE_NAME,cv,"ID = ?",new String[] {"1"});
-        String sqlcommand = "UPDATE TABLE "+TABLE_NAME+" SET "+COL_2+" = "+level+" WHERE ID = 1; ";
-        db.execSQL(sqlcommand);
+        //String sqlcommand = "UPDATE TABLE "+TABLE_NAME+" SET "+COL_2+" = "+level+" WHERE ID = 1; ";
+        //db.execSQL(sqlcommand);
     }
     public void updateName(String name){
-        String sqlcommand = "UPDATE TABLE "+TABLE_NAME+" SET "+COL_3+" = '"+name+"' WHERE ID = 1; ";
-        db.execSQL(sqlcommand);
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COL_3, name);
+        db.update(TABLE_NAME,cv,"ID = ?",new String[] {"1"});
+        //String sqlcommand = "UPDATE TABLE "+TABLE_NAME+" SET "+COL_3+" = '"+name+"' WHERE ID = 1; ";
+        //db.execSQL(sqlcommand);
     }
     public void updatePoints(int points){
-        String sqlcommand = "UPDATE TABLE "+TABLE_NAME+" SET "+COL_4+" = "+points+" WHERE ID = 1; ";
-        db.execSQL(sqlcommand);
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COL_4, points);
+        db.update(TABLE_NAME,cv,"ID = ?",new String[] {"1"});
+        // String sqlcommand = "UPDATE TABLE "+TABLE_NAME+" SET "+COL_4+" = "+points+" WHERE ID = 1; ";
+        //db.execSQL(sqlcommand);
     }
 
-    public SQLiteDatabase getDatabase(){
-        return db;
-    }
+
 
     public Cursor getAllData(){
         SQLiteDatabase db = this.getWritableDatabase();
-        String sqlcommand = "";
+        String sqlcommand = "SELECT * FROM "+TABLE_NAME+" WHERE ID = 1";
         Cursor res = db.rawQuery(sqlcommand, null);
 
         return res;

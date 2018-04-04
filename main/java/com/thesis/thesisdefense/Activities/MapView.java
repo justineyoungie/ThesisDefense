@@ -3,6 +3,7 @@ package com.thesis.thesisdefense.Activities;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -18,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.thesis.thesisdefense.DatabaseHelpers.GameDBhelper;
 import com.thesis.thesisdefense.Models.*;
 import com.thesis.thesisdefense.R;
 
@@ -138,8 +140,10 @@ public class MapView extends SurfaceView implements Runnable {
     private ArrayList<Spell> spellsActive;
 
     private boolean fastforward = false;
+    private GameDBhelper dBhelper;
+    private String name;
 
-    public MapView(Context context, Point size) {
+    public MapView(Context context, Point size, GameDBhelper dbhelper) {
         super(context);
         m_context = context;
 
@@ -177,6 +181,7 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapIce = BitmapFactory.decodeResource(this.getResources(), R.drawable.spell_ice);
         bitmapThunder = BitmapFactory.decodeResource(this.getResources(), R.drawable.spell_thunder);
 
+        this.dBhelper = dbhelper;
 
         loadSound();
         // Start the game
@@ -262,6 +267,15 @@ public class MapView extends SurfaceView implements Runnable {
 
         // Reset the m_Score
         m_Score = 150;
+
+        //read
+        Cursor cursor = dBhelper.getAllData();
+        if(cursor.getCount() > 0){
+            while(cursor.moveToNext()){
+                m_Score = cursor.getInt(3);
+            }
+        }
+
 
         // initialize the spawn times
         for(int i = 0; i < maxWave; i ++){
@@ -727,7 +741,7 @@ public class MapView extends SurfaceView implements Runnable {
                     }
                     else {
                         // update ally is immediate damage
-                        m_Score += ally.updateAlly(enemies, m_BlockSize);
+                        updateScore(m_Score + ally.updateAlly(enemies, m_BlockSize));
 
                         // check contact is for projectiles with damage
                         if(ally instanceof Wizard){
@@ -737,7 +751,7 @@ public class MapView extends SurfaceView implements Runnable {
                                     ((Wizard) ally).removeProjectile(proj);
                                 }
                                 else
-                                    m_Score += proj.checkContact(enemies);
+                                    updateScore(m_Score + proj.checkContact(enemies));
                             }
                         }
 
@@ -948,21 +962,21 @@ public class MapView extends SurfaceView implements Runnable {
                                 switch(spellActivated){
                                     case "Fire":
                                         Fire fire = new Fire();
-                                        m_Score += fire.activateSpell(x, y, enemies, map);
+                                        updateScore(m_Score + fire.activateSpell(x, y, enemies, map));
                                         spellsActive.add(fire);
                                         spellActivated = "";
                                         spellY = -10;
                                         break;
                                     case "Thunder":
                                         Thunder thunder = new Thunder();
-                                        m_Score += thunder.activateSpell(x, y, enemies, map);
+                                        updateScore(m_Score + thunder.activateSpell(x, y, enemies, map));
                                         spellsActive.add(thunder);
                                         spellActivated = "";
                                         spellY = -10;
                                         break;
                                     case "Ice":
                                         Ice ice = new Ice();
-                                        m_Score += ice.activateSpell(enemies, map);
+                                        updateScore(m_Score + ice.activateSpell(enemies, map));
                                         spellsActive.add(ice);
                                         spellActivated = "";
                                         spellY = -10;
@@ -1080,5 +1094,10 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapEnemy = null;
         bitmapMageProjectile = null;
         pause();
+    }
+
+    public void updateScore(int score){
+        m_Score = score;
+        dBhelper.updatePoints(m_Score);
     }
 }
