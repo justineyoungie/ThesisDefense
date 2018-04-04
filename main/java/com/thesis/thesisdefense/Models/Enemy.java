@@ -53,4 +53,11 @@ public abstract class Enemy extends Fighter{
     public void inflictStatus(String status){
         this.status = status;
     }
+
+    public void setDifficulty(String difficulty){
+        switch(difficulty){
+            case "Normal": speed += 5; damage += 1; score *= 2; break;
+            case "Difficult": speed += 10; damage += 2; score *= 4; break;
+        }
+    }
 }

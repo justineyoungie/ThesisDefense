@@ -1,6 +1,7 @@
 package com.thesis.thesisdefense.Activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -108,6 +109,8 @@ public class MapView extends SurfaceView implements Runnable {
     private Bitmap bitmapIceAsset;
     private Bitmap bitmapThunderAsset;
 
+    private Bitmap bitmapCoin;
+
     /*
         For drawing allies to the map
      */
@@ -214,6 +217,8 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapIceAsset = BitmapFactory.decodeResource(this.getResources(), R.drawable.snowstorm);
         bitmapThunderAsset = BitmapFactory.decodeResource(this.getResources(), R.drawable.thunder);
 
+        bitmapCoin = decodeSampleBitmapFromResource(this.getResources(), R.drawable.coin, 100, 100);
+
 
         loadSound();
         // Start the game
@@ -296,7 +301,7 @@ public class MapView extends SurfaceView implements Runnable {
         new Warrior(0, 0, 0, 0, bitmapWarrior, 0);
         new Archer(0, 0, 0, 0, bitmapArcher, bitmapMageProjectile, 0,m_BlockSize,m_ScreenWidth);
         new Spearman(0, 0, 0, 0, bitmapSpearman, 0);
-
+/*
         //read
         Cursor cursor = dBhelper.getAllData();
         if(cursor.getCount() > 0){
@@ -304,7 +309,7 @@ public class MapView extends SurfaceView implements Runnable {
                 m_Score = cursor.getInt(3);
             }
         }
-
+*/
 
         // initialize the spawn times
         for(int i = 0; i < maxWave; i ++){
@@ -435,8 +440,8 @@ public class MapView extends SurfaceView implements Runnable {
                 enemyCount[3] = 12;
                 enemyCount[4] = 15;
                 enemyCount[5] = 15;
-                enemyCount[6] = 15;
-                enemyCount[7] = 15;
+                enemyCount[6] = 20;
+                enemyCount[7] = 30;
 
                 enemySpawnTime[0].add(10000);
                 enemySpawnTime[0].add(18000);
@@ -483,6 +488,8 @@ public class MapView extends SurfaceView implements Runnable {
                 enemySpawnTime[4].add(32500);
                 enemySpawnTime[4].add(36000);
                 enemySpawnTime[4].add(40000);
+                enemySpawnTime[4].add(41000);
+                enemySpawnTime[4].add(41500);
 
 
                 enemySpawnTime[5].add(0);
@@ -498,6 +505,8 @@ public class MapView extends SurfaceView implements Runnable {
                 enemySpawnTime[5].add(32000);
                 enemySpawnTime[5].add(32500);
                 enemySpawnTime[5].add(36000);
+                enemySpawnTime[5].add(40000);
+                enemySpawnTime[5].add(41000);
 
                 enemySpawnTime[6].add(2000);
                 enemySpawnTime[6].add(6000);
@@ -507,19 +516,49 @@ public class MapView extends SurfaceView implements Runnable {
                 enemySpawnTime[6].add(21000);
                 enemySpawnTime[6].add(23000);
                 enemySpawnTime[6].add(25000);
+                enemySpawnTime[6].add(26000);
+                enemySpawnTime[6].add(32000);
+                enemySpawnTime[6].add(32500);
+                enemySpawnTime[6].add(36000);
+                enemySpawnTime[6].add(40000);
+                enemySpawnTime[6].add(41000);
+                enemySpawnTime[6].add(41500);
+                enemySpawnTime[6].add(42000);
+                enemySpawnTime[6].add(45000);
+                enemySpawnTime[6].add(45500);
+                enemySpawnTime[6].add(47000);
+                enemySpawnTime[6].add(51000);
 
-                enemySpawnTime[7].add(4000);
-                enemySpawnTime[7].add(7000);
+                enemySpawnTime[7].add(2000);
+                enemySpawnTime[7].add(6000);
                 enemySpawnTime[7].add(10000);
                 enemySpawnTime[7].add(11000);
                 enemySpawnTime[7].add(16000);
-                enemySpawnTime[7].add(20000);
+                enemySpawnTime[7].add(21000);
                 enemySpawnTime[7].add(23000);
                 enemySpawnTime[7].add(25000);
                 enemySpawnTime[7].add(26000);
                 enemySpawnTime[7].add(32000);
                 enemySpawnTime[7].add(32500);
                 enemySpawnTime[7].add(36000);
+                enemySpawnTime[7].add(40000);
+                enemySpawnTime[7].add(41000);
+                enemySpawnTime[7].add(41500);
+                enemySpawnTime[7].add(42000);
+                enemySpawnTime[7].add(45000);
+                enemySpawnTime[7].add(45500);
+                enemySpawnTime[7].add(47000);
+                enemySpawnTime[7].add(51000);
+                enemySpawnTime[7].add(52000);
+                enemySpawnTime[7].add(52600);
+                enemySpawnTime[7].add(57000);
+                enemySpawnTime[7].add(61000);
+                enemySpawnTime[7].add(61500);
+                enemySpawnTime[7].add(63000);
+                enemySpawnTime[7].add(65000);
+                enemySpawnTime[7].add(70000);
+                enemySpawnTime[7].add(70100);
+                enemySpawnTime[7].add(71000);
 
 
                 break;
@@ -695,6 +734,13 @@ public class MapView extends SurfaceView implements Runnable {
                 m_Paint.setTextSize(24);
                 m_Paint.setColor(Color.rgb(255, 255, 255));
                 m_Canvas.drawText("+" + killedEnemy[3], killedEnemy[0] + (m_BlockSize + 40) / 2, killedEnemy[1] - 30, m_Paint);
+                m_Canvas.drawBitmap(bitmapCoin,
+                                    new Rect(   0, 0, bitmapCoin.getWidth(), bitmapCoin.getHeight()),
+                                    new Rect(   killedEnemy[0] + (m_BlockSize) / 2,
+                                                killedEnemy[1] - 50,
+                                                killedEnemy[0] + (m_BlockSize + 20) / 2,
+                                                killedEnemy[1] - 40),
+                                null);
             }
 
             m_Paint.reset();
@@ -732,9 +778,9 @@ public class MapView extends SurfaceView implements Runnable {
 
             // wizard icon for selection
             src = new Rect(0, 0, bitmapWizardIcon.getWidth(), bitmapWizardIcon.getHeight());
-            dst = new Rect( Math.round(40*scale),
+            dst = new Rect( Math.round(30*scale),
                             Math.round(10*scale),
-                            Math.round(110*scale),
+                            Math.round(100*scale),
                             Math.round(50*scale));
 
             if(isSelecting && selectedAlly.equals("Wizard") || m_Score < 100){
@@ -749,9 +795,9 @@ public class MapView extends SurfaceView implements Runnable {
 
             // warrior icon for selection
             src = new Rect(0, 0, bitmapWarriorIcon.getWidth(), bitmapWarriorIcon.getHeight());
-            dst = new Rect( Math.round(130*scale),
+            dst = new Rect( Math.round(120*scale),
                             Math.round(10*scale),
-                            Math.round(200*scale),
+                            Math.round(190*scale),
                             Math.round(50*scale));
 
             if(isSelecting && selectedAlly.equals("Warrior") || m_Score < 50){
@@ -766,9 +812,9 @@ public class MapView extends SurfaceView implements Runnable {
 
             // archer icon for selection
             src = new Rect(0, 0, bitmapArcherIcon.getWidth(), bitmapArcherIcon.getHeight());
-            dst = new Rect( Math.round(220*scale),
+            dst = new Rect( Math.round(210*scale),
                     Math.round(10*scale),
-                    Math.round(290*scale),
+                    Math.round(280*scale),
                     Math.round(50*scale));
 
             if(isSelecting && selectedAlly.equals("Archer") || m_Score < 75){
@@ -783,9 +829,9 @@ public class MapView extends SurfaceView implements Runnable {
 
             // spearman icon for selection
             src = new Rect(0, 0, bitmapSpearmanIcon.getWidth(), bitmapSpearmanIcon.getHeight());
-            dst = new Rect( Math.round(310*scale),
+            dst = new Rect( Math.round(300*scale),
                             Math.round(10*scale),
-                            Math.round(380*scale),
+                            Math.round(370*scale),
                             Math.round(50*scale));
 
             if(isSelecting && selectedAlly.equals("Spearman") || m_Score < 125){
@@ -798,7 +844,9 @@ public class MapView extends SurfaceView implements Runnable {
 
             m_Paint.reset();
 
-
+            m_Paint.setColor(Color.rgb(0,0,0));
+            m_Paint.setTextSize(30);
+            m_Paint.setTextAlign(Paint.Align.CENTER);
             // spell container
             src = new Rect( 0, 0, bitmapSpells.getWidth(), bitmapSpells.getHeight());
             dst = new Rect( (int) (m_ScreenWidth - 200 * scale),    (int) (m_ScreenHeight + spellY * scale),
@@ -811,11 +859,14 @@ public class MapView extends SurfaceView implements Runnable {
                             (int) (m_ScreenWidth - 140 * scale),     (int) (m_ScreenHeight + (spellY + 80) * scale));
             m_Canvas.drawBitmap(bitmapFire, src, dst, null);
 
+            m_Canvas.drawText("300", dst.centerX(), dst.bottom + 20, m_Paint);
             //spell ice
             // src = new Rect(0,0, bitmapIce.getWidth(), bitmapIce.getHeight());
             dst = new Rect( (int) (m_ScreenWidth - 130 * scale),    (int) (m_ScreenHeight + (spellY + 30) * scale),
                             (int) (m_ScreenWidth - 80 * scale),    (int) (m_ScreenHeight + (spellY + 80) * scale));
             m_Canvas.drawBitmap(bitmapIce, src, dst, null);
+
+            m_Canvas.drawText("500", dst.centerX(), dst.bottom + 20, m_Paint);
 
             //spell thunder
             // src = new Rect(0,0, bitmapThunder.getWidth(), bitmapThunder.getHeight());
@@ -823,6 +874,7 @@ public class MapView extends SurfaceView implements Runnable {
                             (int) (m_ScreenWidth - 20 * scale),    (int) (m_ScreenHeight + (spellY + 80) * scale));
             m_Canvas.drawBitmap(bitmapThunder, src, dst, null);
 
+            m_Canvas.drawText("200", dst.centerX(), dst.bottom + 20, m_Paint);
 
             // set spells ablaze
             for(int i = 0; i < spellsActive.size(); i++){
@@ -861,9 +913,9 @@ public class MapView extends SurfaceView implements Runnable {
                         m_Canvas.drawBitmap(bitmapThunderAsset,
                                 new Rect(0, 0, bitmapThunderAsset.getWidth(), bitmapThunderAsset.getHeight()),
                                 new Rect(   map[block.y][block.x].x,
-                                        map[block.y][block.x].y,
+                                        map[block.y][block.x].y -  (int)(20 * scale),
                                         map[block.y][block.x].x + m_BlockSize,
-                                        map[block.y][block.x].y + m_NumBlocksHigh + (int)(20 * scale)),
+                                        map[block.y][block.x].y + m_NumBlocksHigh),
                                 null);
                     }
                 }
@@ -977,6 +1029,27 @@ public class MapView extends SurfaceView implements Runnable {
                                 (int)((m_ScreenWidth + 200 * scale) / 2),
                                 (int)((m_ScreenHeight + 50 * scale) / 2));
                 m_Canvas.drawBitmap(bitmapDefeat, src, dst, null);
+
+                m_Paint.reset();
+
+                m_Paint.setColor(Color.rgb( 45, 45, 205));
+                m_Canvas.drawRect(  (float) (m_ScreenWidth / 4),
+                                    (float) (m_ScreenHeight / 4 * 3),
+                                    (float) (m_ScreenWidth / 4 + 130 * scale),
+                                    (float) (m_ScreenHeight / 4 * 3 + 80 * scale),
+                                    m_Paint);
+
+                m_Canvas.drawRect(  (float) (m_ScreenWidth / 2 + 30 * scale),
+                                    (float) (m_ScreenHeight / 4 * 3),
+                                    (float) (m_ScreenWidth / 4 * 3 + 30 * scale),
+                                    (float) (m_ScreenHeight / 4 * 3 + 80 * scale),
+                                    m_Paint);
+
+                m_Paint.setColor(Color.WHITE);
+                m_Paint.setTextSize(36);
+
+                m_Canvas.drawText("Retry", m_ScreenWidth / 4 + 40 * scale, m_ScreenHeight / 4 * 3 + 50 * scale, m_Paint);
+                m_Canvas.drawText("Go to Main Menu", m_ScreenWidth / 2 + 50 * scale, m_ScreenHeight / 4 * 3 + 50 * scale, m_Paint);
 
             }
             // if paused, draw the pause screen
@@ -1173,9 +1246,21 @@ public class MapView extends SurfaceView implements Runnable {
                     startGame();
                 }
                 else if(gameOver){
-                    //this.destroy();
-                    pause();
-                    startGame();
+                   if( motionEvent.getX() >= m_ScreenWidth / 4 &&
+                       motionEvent.getY() >= m_ScreenHeight / 4 * 3 &&
+                       motionEvent.getX() <= m_ScreenWidth / 4 + 130 * scale &&
+                       motionEvent.getY() <= m_ScreenHeight / 4 * 3 + 80 * scale){ // retry
+                       pause();
+                       startGame();
+                   }
+                   else if( motionEvent.getX() >= (m_ScreenWidth / 2 + 30 * scale) &&
+                            motionEvent.getY() >= m_ScreenHeight / 4 * 3 &&
+                            motionEvent.getX() <= m_ScreenWidth / 4 * 3 + 30 * scale &&
+                            motionEvent.getY() <= m_ScreenHeight / 4 * 3 + 80 * scale){
+                       this.destroy();
+                       this.getContext().startActivity(new Intent(this.getContext(), LevelSelect.class));
+                   }
+
                 }
                 else if(!m_Playing){
                     m_Playing = true;
@@ -1183,8 +1268,8 @@ public class MapView extends SurfaceView implements Runnable {
                 }
 
 
-                else if(motionEvent.getX() >= Math.round(40 * scale) &&
-                        motionEvent.getX() <= Math.round(120 * scale) &&
+                else if(motionEvent.getX() >= Math.round(30 * scale) &&
+                        motionEvent.getX() <= Math.round(110 * scale) &&
                         motionEvent.getY() >= Math.round(10 * scale) &&
                         motionEvent.getY() <= Math.round(50 * scale) &&
                         m_Score >= 100){ // ummm if you touch the wizard icon
@@ -1194,8 +1279,8 @@ public class MapView extends SurfaceView implements Runnable {
                     selectedAlly = "Wizard";
                 }
 
-                else if(motionEvent.getX() >= Math.round(130 * scale) &&
-                        motionEvent.getX() <= Math.round(200 * scale) &&
+                else if(motionEvent.getX() >= Math.round(120 * scale) &&
+                        motionEvent.getX() <= Math.round(190 * scale) &&
                         motionEvent.getY() >= Math.round(10 * scale) &&
                         motionEvent.getY() <= Math.round(50 * scale) &&
                         m_Score >= 50){ // pressed the warrior icon
@@ -1205,8 +1290,8 @@ public class MapView extends SurfaceView implements Runnable {
                     selectedAlly = "Warrior";
                 }
 
-                else if(motionEvent.getX() >= Math.round(220 * scale) &&
-                        motionEvent.getX() <= Math.round(290 * scale) &&
+                else if(motionEvent.getX() >= Math.round(210 * scale) &&
+                        motionEvent.getX() <= Math.round(280 * scale) &&
                         motionEvent.getY() >= Math.round(10 * scale) &&
                         motionEvent.getY() <= Math.round(50 * scale) &&
                         m_Score >= 50){ // pressed the archer icon
@@ -1216,8 +1301,8 @@ public class MapView extends SurfaceView implements Runnable {
                     selectedAlly = "Archer";
                 }
 
-                else if(motionEvent.getX() >= Math.round(310 * scale) &&
-                        motionEvent.getX() <= Math.round(380 * scale) &&
+                else if(motionEvent.getX() >= Math.round(300 * scale) &&
+                        motionEvent.getX() <= Math.round(370 * scale) &&
                         motionEvent.getY() >= Math.round(10 * scale) &&
                         motionEvent.getY() <= Math.round(50 * scale) &&
                         m_Score >= 50){ // pressed the spearman icon
@@ -1289,23 +1374,32 @@ public class MapView extends SurfaceView implements Runnable {
                                 motionEvent.getY() <= map[y][x].y + m_NumBlocksHigh){ // if within a block inside map
                                 switch(spellActivated){
                                     case "Fire":
-                                        Fire fire = new Fire();
-                                        updateScore(m_Score + fire.activateSpell(x, y, enemies, map));
-                                        spellsActive.add(fire);
+                                        if(m_Score >= 300) {
+                                            m_Score -= 300;
+                                            Fire fire = new Fire();
+                                            updateScore(m_Score + fire.activateSpell(x, y, enemies, map));
+                                            spellsActive.add(fire);
+                                        }
                                         spellActivated = "";
                                         spellY = -10;
                                         break;
                                     case "Thunder":
-                                        Thunder thunder = new Thunder();
-                                        updateScore(m_Score + thunder.activateSpell(x, y, enemies, map));
-                                        spellsActive.add(thunder);
+                                        if(m_Score >= 200) {
+                                            m_Score -= 200;
+                                            Thunder thunder = new Thunder();
+                                            updateScore(m_Score + thunder.activateSpell(x, y, enemies, map));
+                                            spellsActive.add(thunder);
+                                        }
                                         spellActivated = "";
                                         spellY = -10;
                                         break;
                                     case "Ice":
-                                        Ice ice = new Ice();
-                                        updateScore(m_Score + ice.activateSpell(enemies, map));
-                                        spellsActive.add(ice);
+                                        if(m_Score >= 500) {
+                                            m_Score -= 500;
+                                            Ice ice = new Ice();
+                                            updateScore(m_Score + ice.activateSpell(enemies, map));
+                                            spellsActive.add(ice);
+                                        }
                                         spellActivated = "";
                                         spellY = -10;
                                         break;
@@ -1414,11 +1508,13 @@ public class MapView extends SurfaceView implements Runnable {
             panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapEnemy,scale,m_BlockSize);
         //else
         //    panel = new EnemyMage(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapEnemy, bitmapEnemyProjectile, scale,m_BlockSize);
+        panel.setDifficulty(difficulty);
         enemies.add(panel);
     }
 
 
     public void destroy(){
+        pause();
         bitmapWizard.recycle();
         bitmapBackground.recycle();
         bitmapWizardIcon.recycle();
@@ -1447,7 +1543,7 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapSpearman = null;
         bitmapSpearmanIcon = null;
         bitmapArcherProjectile = null;
-        pause();
+        m_Thread = null;
     }
 
     public void updateScore(int score){
