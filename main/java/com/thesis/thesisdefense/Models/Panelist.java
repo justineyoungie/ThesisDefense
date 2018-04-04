@@ -3,8 +3,8 @@ package com.thesis.thesisdefense.Models;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import static com.thesis.thesisdefense.Activities.MapView.TAG;
-import static com.thesis.thesisdefense.Activities.MapView.m_BlockSize;
+//import static com.thesis.thesisdefense.Activities.MapView.TAG;
+//import static com.thesis.thesisdefense.Activities.MapView.m_BlockSize;
 
 /**
  * Created by justine on 3/10/18.
@@ -15,10 +15,12 @@ public class Panelist extends Enemy{
     public static int FRAME_WIDTH;
     public static int FRAME_HEIGHT;
 
-    public Panelist(int posX, int poxY, int indexY, Bitmap image, float scale) {
+    private int m_blocksize;
+    public Panelist(int posX, int poxY, int indexY, Bitmap image, float scale, int m_blocksize) {
         super(posX, poxY, 7, 1, 750, indexY, 471, 494, image, scale, 7, 7, 5, 1, 25);
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.incrementY;
+        this.m_blocksize = m_blocksize;
 
     }
 
@@ -32,7 +34,7 @@ public class Panelist extends Enemy{
             for(int i = 0; i < allyMap[this.LaneY].length; i++){
                 Ally ally = allyMap[this.LaneY][i];
                 if(ally != null){
-                    if( this.posX <= ally.posX+m_BlockSize*range-30 && this.posX + (m_BlockSize + 90) / 2 > ally.posX + 30 &&
+                    if( this.posX <= ally.posX+m_blocksize*range-30 && this.posX + (m_blocksize + 90) / 2 > ally.posX + 30 &&
                         this.Rival == null){ //add ally to enemys encounter if ally is in range
 
                         encounterAlly(ally);

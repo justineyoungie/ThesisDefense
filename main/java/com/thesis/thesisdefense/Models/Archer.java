@@ -2,9 +2,10 @@ package com.thesis.thesisdefense.Models;
 
 import android.graphics.Bitmap;
 
-import com.thesis.thesisdefense.Activities.MapView;
-
 import java.util.ArrayList;
+
+import static com.thesis.thesisdefense.Activities.MapView.m_BlockSize;
+import static com.thesis.thesisdefense.Activities.MapView.m_ScreenWidth;
 
 /**
  * Created by justine on 4/4/18.
@@ -38,8 +39,8 @@ public class Archer extends Ally {
         // a projectile will be launched
         if(this.kill){
             kill = false;
-            projectiles.add(new Projectile(posX + MapView.m_BlockSize, posY, projImage,
-                    this.scale, this, (int)(50 * scale), 30));
+            projectiles.add(new Projectile(posX + m_BlockSize, posY, projImage,
+                    this.scale, this, (int)(50 * scale), 30, m_BlockSize, m_ScreenWidth));
         }
         return 0;
     }

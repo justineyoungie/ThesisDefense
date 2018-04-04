@@ -18,14 +18,18 @@ public class Wizard extends Ally{
     private ArrayList<Projectile> projectiles;
     private Bitmap projImage;
 
-    public Wizard(int posX, int poxY, int indexX, int indexY, Bitmap image, Bitmap projImage, float scale) {
+    private int m_blocksize;
+    private int m_ScreenWidth;
+    public Wizard(int posX, int poxY, int indexX, int indexY, Bitmap image, Bitmap projImage, float scale, int m_blocksize, int m_ScreenWidth) {
         super(posX, poxY, 5, 1, 1000, indexX, indexY,
                 477, 484, image, scale,
-                8, 8, 7);
+                7, 7, 7);
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.incrementY;
         this.projImage = projImage;
         projectiles = new ArrayList<>();
+        this.m_blocksize = m_blocksize;
+        this.m_ScreenWidth = m_ScreenWidth;
 
     }
 
@@ -39,7 +43,7 @@ public class Wizard extends Ally{
         if(this.kill){
             kill = false;
             projectiles.add(new Projectile(posX + MapView.m_BlockSize, posY, projImage,
-                    this.scale, this, (int)(50 * scale), 30));
+                    this.scale, this, (int)(50 * scale), 30,m_blocksize,m_ScreenWidth));
         }
         return 0;
     }
