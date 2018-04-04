@@ -15,11 +15,8 @@ public class Spearman extends Ally{
     public static int FRAME_WIDTH;
     public static int FRAME_HEIGHT;
 
-    private ArrayList<Projectile> projectiles;
-    private Bitmap projImage;
-
     public Spearman(int posX, int poxY, int indexX, int indexY, Bitmap image, float scale) {
-        super(posX, poxY, 10, 2, 500, indexX, indexY, 615, 475, image, scale, 7, 9, 2);
+        super(posX, poxY, 10, 2, 500, indexX, indexY, 615, 475, image, scale, 6, 8, 2);
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.incrementY;
     }

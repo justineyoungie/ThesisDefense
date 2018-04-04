@@ -19,14 +19,19 @@ public class Archer extends Ally {
     private ArrayList<Projectile> projectiles;
     private Bitmap projImage;
 
-    public Archer(int posX, int poxY, int indexX, int indexY, Bitmap image, Bitmap projImage, float scale) {
-        super(posX, poxY, 5, 1, 1000, indexX, indexY,
+    private int m_blocksize;
+    private int m_ScreenWidth;
+
+    public Archer(int posX, int poxY, int indexX, int indexY, Bitmap image, Bitmap projImage, float scale, int m_blocksize, int m_ScreenWidth) {
+        super(posX, poxY, 5, 1, 500, indexX, indexY,
                 485, 493, image, scale,
                 8, 7, 7);
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.incrementY;
         this.projImage = projImage;
         projectiles = new ArrayList<>();
+        this.m_blocksize = m_blocksize;
+        this.m_ScreenWidth = m_ScreenWidth;
 
     }
 
@@ -40,7 +45,7 @@ public class Archer extends Ally {
         if(this.kill){
             kill = false;
             projectiles.add(new Projectile(posX + m_BlockSize, posY, projImage,
-                    this.scale, this, (int)(50 * scale), 30, m_BlockSize, m_ScreenWidth));
+                    this.scale, this, (int)(50 * scale), 30, this.m_blocksize, this.m_ScreenWidth));
         }
         return 0;
     }

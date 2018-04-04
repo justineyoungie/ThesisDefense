@@ -74,7 +74,7 @@ public class MapView extends SurfaceView implements Runnable {
     private int m_Score;
 
     private int currentWave = 0;
-    private int maxWave = 3;
+    private int maxWave;
 
     /*// The location in the grid of all the segments
     private int[] m_SnakeXs;
@@ -92,6 +92,8 @@ public class MapView extends SurfaceView implements Runnable {
     private Bitmap bitmapThesis;
     private Bitmap bitmapCastle;
     private Bitmap bitmapEnemy;
+    private Bitmap bitmapEnemyMage;
+    private Bitmap bitmapEnemyProjectile;
     private Bitmap bitmapMageProjectile;
     private Bitmap bitmapArcherProjectile;
     private Bitmap bitmapSpells;
@@ -99,6 +101,10 @@ public class MapView extends SurfaceView implements Runnable {
     private Bitmap bitmapFire;
     private Bitmap bitmapIce;
     private Bitmap bitmapThunder;
+
+    private Bitmap bitmapFireAsset;
+    private Bitmap bitmapIceAsset;
+    private Bitmap bitmapThunderAsset;
 
     /*
         For drawing allies to the map
@@ -142,12 +148,15 @@ public class MapView extends SurfaceView implements Runnable {
     private String spellActivated = "";
     private ArrayList<Spell> spellsActive;
 
+    private String difficulty;
+
     private boolean fastforward = false;
 
-    public MapView(Context context, Point size) {
+    public MapView(Context context, Point size, String difficulty) {
         super(context);
         m_context = context;
 
+        this.difficulty = difficulty;
         m_ScreenWidth = size.x;
         m_ScreenHeight = size.y;
 
@@ -179,18 +188,27 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapSpearman = decodeSampleBitmapFromResource(this.getResources(), R.drawable.spearman, 250, 250);
         bitmapSpearmanIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.spear_icon);
 
+        // enemy warrior
         bitmapEnemy = decodeSampleBitmapFromResource(this.getResources(), R.drawable.enemy_knight, 250, 250);
+        // enemy mage
+        bitmapEnemyMage = decodeSampleBitmapFromResource(this.getResources(), R.drawable.enemy_mage, 250, 250);
 
         bitmapCastle = decodeSampleBitmapFromResource(this.getResources(), R.drawable.castle, 150, 150);
         bitmapThesis = BitmapFactory.decodeResource(this.getResources(), R.drawable.thesis);
 
         bitmapMageProjectile = decodeSampleBitmapFromResource(this.getResources(), R.drawable.mage_projectile, 150, 150);
         bitmapArcherProjectile = decodeSampleBitmapFromResource(this.getResources(), R.drawable.archer_projectile, 150, 150);
+        bitmapEnemyProjectile = decodeSampleBitmapFromResource(this.getResources(), R.drawable.enemy_projectile, 150, 150);
         bitmapSpells = decodeSampleBitmapFromResource(this.getResources(), R.drawable.spells, 100, 100);
 
         bitmapFire = BitmapFactory.decodeResource(this.getResources(), R.drawable.spell_fire);
         bitmapIce = BitmapFactory.decodeResource(this.getResources(), R.drawable.spell_ice);
         bitmapThunder = BitmapFactory.decodeResource(this.getResources(), R.drawable.spell_thunder);
+
+        bitmapFireAsset = BitmapFactory.decodeResource(this.getResources(), R.drawable.fire);
+        bitmapIceAsset = BitmapFactory.decodeResource(this.getResources(), R.drawable.snowstorm);
+        bitmapThunderAsset = BitmapFactory.decodeResource(this.getResources(), R.drawable.thunder);
+
 
         loadSound();
         // Start the game
@@ -246,13 +264,12 @@ public class MapView extends SurfaceView implements Runnable {
     }
 
     public void startGame() {
-        // initializing resources
-
+        // ini
         // reset everything
         currentWave = 0;
         allyMap = new Ally[5][8];
-        enemyCount = new int[maxWave];
-        enemySpawnTime = new ArrayList[maxWave];
+        //initializing resources
+
         map = new Point[5][8];
 
         enemies = new ArrayList<>();
@@ -272,61 +289,225 @@ public class MapView extends SurfaceView implements Runnable {
         // temporary instantiation
         new Wizard(0, 0, 0, 0, bitmapWizard, bitmapMageProjectile, scale,m_BlockSize,m_ScreenWidth);
         new Warrior(0, 0, 0, 0, bitmapWarrior, 0);
-        new Archer(0, 0, 0, 0, bitmapArcher, bitmapMageProjectile, 0);
+        new Archer(0, 0, 0, 0, bitmapArcher, bitmapMageProjectile, 0,m_BlockSize,m_ScreenWidth);
         new Spearman(0, 0, 0, 0, bitmapSpearman, 0);
 
 
-        // Reset the m_Score
-        m_Score = 150;
+        switch(difficulty){
+            case "Easy":
+                maxWave = 3;
+                enemyCount = new int[maxWave];
+                enemySpawnTime = new ArrayList[maxWave];
 
-        // initialize the spawn times
-        for(int i = 0; i < maxWave; i ++){
-            enemySpawnTime[i] = new ArrayList<Integer>();
+                // Reset the m_Score
+                m_Score = 150;
+
+                // initialize the spawn times
+                for(int i = 0; i < maxWave; i ++){
+                    enemySpawnTime[i] = new ArrayList<Integer>();
+                }
+
+                // for now, manually add each time to the arraylists
+                enemyCount[0] = 3;
+                enemyCount[1] = 5;
+                enemyCount[2] = 8;
+
+                enemySpawnTime[0].add(10000);
+                enemySpawnTime[0].add(18000);
+                enemySpawnTime[0].add(24000);
+
+                enemySpawnTime[1].add(0);
+                enemySpawnTime[1].add(2000);
+                enemySpawnTime[1].add(7000);
+                enemySpawnTime[1].add(12000);
+                enemySpawnTime[1].add(14000);
+
+                enemySpawnTime[2].add(2000);
+                enemySpawnTime[2].add(6000);
+                enemySpawnTime[2].add(10000);
+                enemySpawnTime[2].add(11000);
+                enemySpawnTime[2].add(16000);
+                enemySpawnTime[2].add(21000);
+                enemySpawnTime[2].add(23000);
+                enemySpawnTime[2].add(25000);
+                break;
+
+
+            case "Moderate":
+                maxWave = 5;
+                enemyCount = new int[maxWave];
+                enemySpawnTime = new ArrayList[maxWave];
+
+                // Reset the m_Score
+                m_Score = 250;
+
+                // initialize the spawn times
+                for(int i = 0; i < maxWave; i ++){
+                    enemySpawnTime[i] = new ArrayList<Integer>();
+                }
+
+                // for now, manually add each time to the arraylists
+                enemyCount[0] = 3;
+                enemyCount[1] = 5;
+                enemyCount[2] = 8;
+                enemyCount[3] = 12;
+                enemyCount[4] = 15;
+
+                enemySpawnTime[0].add(10000);
+                enemySpawnTime[0].add(18000);
+                enemySpawnTime[0].add(24000);
+
+                enemySpawnTime[1].add(0);
+                enemySpawnTime[1].add(2000);
+                enemySpawnTime[1].add(7000);
+                enemySpawnTime[1].add(12000);
+                enemySpawnTime[1].add(14000);
+
+                enemySpawnTime[2].add(2000);
+                enemySpawnTime[2].add(6000);
+                enemySpawnTime[2].add(10000);
+                enemySpawnTime[2].add(11000);
+                enemySpawnTime[2].add(16000);
+                enemySpawnTime[2].add(21000);
+                enemySpawnTime[2].add(23000);
+                enemySpawnTime[2].add(25000);
+
+                enemySpawnTime[3].add(4000);
+                enemySpawnTime[3].add(7000);
+                enemySpawnTime[3].add(10000);
+                enemySpawnTime[3].add(11000);
+                enemySpawnTime[3].add(16000);
+                enemySpawnTime[3].add(20000);
+                enemySpawnTime[3].add(23000);
+                enemySpawnTime[3].add(25000);
+                enemySpawnTime[3].add(26000);
+                enemySpawnTime[3].add(32000);
+                enemySpawnTime[3].add(32500);
+                enemySpawnTime[3].add(36000);
+
+                enemySpawnTime[4].add(4000);
+                enemySpawnTime[4].add(7000);
+                enemySpawnTime[4].add(10000);
+                enemySpawnTime[4].add(11000);
+                enemySpawnTime[4].add(16000);
+                enemySpawnTime[4].add(20000);
+                enemySpawnTime[4].add(23000);
+                enemySpawnTime[4].add(25000);
+                enemySpawnTime[4].add(26000);
+                enemySpawnTime[4].add(32000);
+                enemySpawnTime[4].add(32500);
+                enemySpawnTime[4].add(36000);
+                break;
+            case "Difficult":
+                maxWave = 8;
+                enemyCount = new int[maxWave];
+                enemySpawnTime = new ArrayList[maxWave];
+
+                // Reset the m_Score
+                m_Score = 300;
+
+                // initialize the spawn times
+                for(int i = 0; i < maxWave; i ++){
+                    enemySpawnTime[i] = new ArrayList<Integer>();
+                }
+
+                // for now, manually add each time to the arraylists
+                enemyCount[0] = 3;
+                enemyCount[1] = 5;
+                enemyCount[2] = 8;
+                enemyCount[3] = 12;
+                enemyCount[4] = 15;
+                enemyCount[5] = 15;
+                enemyCount[6] = 15;
+                enemyCount[7] = 15;
+
+                enemySpawnTime[0].add(10000);
+                enemySpawnTime[0].add(18000);
+                enemySpawnTime[0].add(24000);
+
+                enemySpawnTime[1].add(0);
+                enemySpawnTime[1].add(2000);
+                enemySpawnTime[1].add(7000);
+                enemySpawnTime[1].add(12000);
+                enemySpawnTime[1].add(14000);
+
+                enemySpawnTime[2].add(2000);
+                enemySpawnTime[2].add(6000);
+                enemySpawnTime[2].add(10000);
+                enemySpawnTime[2].add(11000);
+                enemySpawnTime[2].add(16000);
+                enemySpawnTime[2].add(21000);
+                enemySpawnTime[2].add(23000);
+                enemySpawnTime[2].add(25000);
+
+                enemySpawnTime[3].add(4000);
+                enemySpawnTime[3].add(7000);
+                enemySpawnTime[3].add(10000);
+                enemySpawnTime[3].add(11000);
+                enemySpawnTime[3].add(16000);
+                enemySpawnTime[3].add(20000);
+                enemySpawnTime[3].add(23000);
+                enemySpawnTime[3].add(25000);
+                enemySpawnTime[3].add(26000);
+                enemySpawnTime[3].add(32000);
+                enemySpawnTime[3].add(32500);
+                enemySpawnTime[3].add(36000);
+
+                enemySpawnTime[4].add(4000);
+                enemySpawnTime[4].add(7000);
+                enemySpawnTime[4].add(10000);
+                enemySpawnTime[4].add(11000);
+                enemySpawnTime[4].add(16000);
+                enemySpawnTime[4].add(20000);
+                enemySpawnTime[4].add(23000);
+                enemySpawnTime[4].add(25000);
+                enemySpawnTime[4].add(26000);
+                enemySpawnTime[4].add(32000);
+                enemySpawnTime[4].add(32500);
+                enemySpawnTime[4].add(36000);
+                enemySpawnTime[4].add(40000);
+
+
+                enemySpawnTime[5].add(0);
+                enemySpawnTime[5].add(2000);
+                enemySpawnTime[5].add(7000);
+                enemySpawnTime[5].add(12000);
+                enemySpawnTime[5].add(14000);
+                enemySpawnTime[5].add(16000);
+                enemySpawnTime[5].add(20000);
+                enemySpawnTime[5].add(23000);
+                enemySpawnTime[5].add(25000);
+                enemySpawnTime[5].add(26000);
+                enemySpawnTime[5].add(32000);
+                enemySpawnTime[5].add(32500);
+                enemySpawnTime[5].add(36000);
+
+                enemySpawnTime[6].add(2000);
+                enemySpawnTime[6].add(6000);
+                enemySpawnTime[6].add(10000);
+                enemySpawnTime[6].add(11000);
+                enemySpawnTime[6].add(16000);
+                enemySpawnTime[6].add(21000);
+                enemySpawnTime[6].add(23000);
+                enemySpawnTime[6].add(25000);
+
+                enemySpawnTime[7].add(4000);
+                enemySpawnTime[7].add(7000);
+                enemySpawnTime[7].add(10000);
+                enemySpawnTime[7].add(11000);
+                enemySpawnTime[7].add(16000);
+                enemySpawnTime[7].add(20000);
+                enemySpawnTime[7].add(23000);
+                enemySpawnTime[7].add(25000);
+                enemySpawnTime[7].add(26000);
+                enemySpawnTime[7].add(32000);
+                enemySpawnTime[7].add(32500);
+                enemySpawnTime[7].add(36000);
+
+
+                break;
         }
 
-
-
-        allyMap[4][3] = new Spearman(map[4][3].x, map[4][3].y,
-                3, 4,
-                bitmapWarrior, scale);
-        allyMap[3][3] = new Spearman(map[3][3].x, map[3][3].y,
-                3, 3,
-                bitmapWarrior, scale);
-        allyMap[2][3] = new Spearman(map[2][3].x, map[2][3].y,
-                3, 2,
-                bitmapWarrior, scale);
-        allyMap[1][3] = new Spearman(map[1][3].x, map[1][3].y,
-                3, 1,
-                bitmapWarrior, scale);
-        allyMap[0][3] = new Spearman(map[0][3].x, map[0][3].y,
-                3, 0,
-                bitmapWarrior, scale);
-
-
-        // for now, manually add each time to the arraylists
-        Random rand = new Random();
-        enemyCount[0] = 3;
-        enemyCount[1] = 5;
-        enemyCount[2] = 8;
-
-        enemySpawnTime[0].add(10000);
-        enemySpawnTime[0].add(18000);
-        enemySpawnTime[0].add(24000);
-
-        enemySpawnTime[1].add(0);
-        enemySpawnTime[1].add(2000);
-        enemySpawnTime[1].add(7000);
-        enemySpawnTime[1].add(12000);
-        enemySpawnTime[1].add(14000);
-
-        enemySpawnTime[2].add(2000);
-        enemySpawnTime[2].add(6000);
-        enemySpawnTime[2].add(10000);
-        enemySpawnTime[2].add(11000);
-        enemySpawnTime[2].add(16000);
-        enemySpawnTime[2].add(21000);
-        enemySpawnTime[2].add(23000);
-        enemySpawnTime[2].add(25000);
 
         resume();
         // Setup m_NextFrameTime so an update is triggered immediately
@@ -476,6 +657,15 @@ public class MapView extends SurfaceView implements Runnable {
                                 src = new Rect(0, 0, bitmapMageProjectile.getWidth(), bitmapMageProjectile.getHeight());
                                 dst = new Rect(proj.getPosX(), proj.getPosY(), (int)(proj.getPosX() + 50 * scale), (int)(proj.getPosY() + 50 * scale));
                                 m_Canvas.drawBitmap(bitmapMageProjectile, src, dst, null);
+                            }
+                        }
+                        else if(ally instanceof Archer){
+                            ArrayList<Projectile> projectiles = ((Archer) ally).getProjectiles();
+                            for(int i = 0; i < projectiles.size(); i++){
+                                Projectile proj = projectiles.get(i);
+                                src = new Rect(0, 0, bitmapArcherProjectile.getWidth(), bitmapArcherProjectile.getHeight());
+                                dst = new Rect(proj.getPosX(), proj.getPosY(), (int)(proj.getPosX() + 100 * scale), (int)(proj.getPosY() + 40 * scale));
+                                m_Canvas.drawBitmap(bitmapArcherProjectile, src, dst, null);
                             }
                         }
                     }
@@ -630,6 +820,13 @@ public class MapView extends SurfaceView implements Runnable {
                                             map[block.y][block.x].x + m_BlockSize,
                                             map[block.y][block.x].y + m_NumBlocksHigh,
                                             m_Paint);
+                        m_Canvas.drawBitmap(bitmapFireAsset,
+                                new Rect(0, 0, bitmapFireAsset.getWidth(), bitmapFireAsset.getHeight()),
+                                new Rect(   map[block.y][block.x].x,
+                                            map[block.y][block.x].y,
+                                            map[block.y][block.x].x + m_BlockSize,
+                                            map[block.y][block.x].y + m_NumBlocksHigh),
+                                null);
                     }
 
                 }
@@ -643,6 +840,14 @@ public class MapView extends SurfaceView implements Runnable {
                                 map[block.y][block.x].x + m_BlockSize,
                                 map[block.y][block.x].y + m_NumBlocksHigh,
                                 m_Paint);
+
+                        m_Canvas.drawBitmap(bitmapThunderAsset,
+                                new Rect(0, 0, bitmapThunderAsset.getWidth(), bitmapThunderAsset.getHeight()),
+                                new Rect(   map[block.y][block.x].x,
+                                        map[block.y][block.x].y,
+                                        map[block.y][block.x].x + m_BlockSize,
+                                        map[block.y][block.x].y + m_NumBlocksHigh + (int)(20 * scale)),
+                                null);
                     }
                 }
 
@@ -656,7 +861,15 @@ public class MapView extends SurfaceView implements Runnable {
                                             map[block.y][block.x].x + m_BlockSize,
                                             map[block.y][block.x].y + m_NumBlocksHigh,
                                             m_Paint);
+
                     }
+                    m_Canvas.drawBitmap(bitmapIceAsset,
+                            new Rect(0, 0, bitmapIceAsset.getWidth(), bitmapIceAsset.getHeight()),
+                            new Rect(map[0][0].x,
+                                    map[0][0].y,
+                                    map[4][7].x + m_BlockSize,
+                                    map[4][7].y + m_NumBlocksHigh),
+                            null);
                 }
             }
 
@@ -729,9 +942,9 @@ public class MapView extends SurfaceView implements Runnable {
 
                 Bitmap bitmapVictory = decodeSampleBitmapFromResource(this.getResources(), R.drawable.victory, 250, 100);
                 src = new Rect(0, 0, bitmapVictory.getWidth(), bitmapVictory.getHeight());
-                dst = new Rect( (int)((m_ScreenWidth - 100 * scale) / 2),
+                dst = new Rect( (int)((m_ScreenWidth - 200 * scale) / 2),
                                 (int)((m_ScreenHeight - 50 * scale) / 2),
-                                (int)((m_ScreenWidth + 100 * scale) / 2),
+                                (int)((m_ScreenWidth + 200 * scale) / 2),
                                 (int)((m_ScreenHeight + 50 * scale) / 2));
                 m_Canvas.drawBitmap(bitmapVictory, src, dst, null);
 
@@ -742,11 +955,12 @@ public class MapView extends SurfaceView implements Runnable {
 
                 Bitmap bitmapDefeat = decodeSampleBitmapFromResource(this.getResources(), R.drawable.defeat, 250, 100);
                 src = new Rect(0, 0, bitmapDefeat.getWidth(), bitmapDefeat.getHeight());
-                dst = new Rect( (int)((m_ScreenWidth - 100 * scale) / 2),
+                dst = new Rect( (int)((m_ScreenWidth - 200 * scale) / 2),
                                 (int)((m_ScreenHeight - 50 * scale) / 2),
-                                (int)((m_ScreenWidth + 100 * scale) / 2),
+                                (int)((m_ScreenWidth + 200 * scale) / 2),
                                 (int)((m_ScreenHeight + 50 * scale) / 2));
                 m_Canvas.drawBitmap(bitmapDefeat, src, dst, null);
+
             }
             // if paused, draw the pause screen
             else if(!m_Playing) {
@@ -840,6 +1054,16 @@ public class MapView extends SurfaceView implements Runnable {
             }
             else {
                 enemy.updateEnemy(allyMap);
+                if(enemy instanceof EnemyMage){
+                    for(int i = 0; i < ((EnemyMage) enemy).getProjectiles().size(); i++){
+                        Projectile proj = ((EnemyMage) enemy).getProjectiles().get(i);
+                        if(proj.hasEncountered()){
+                            ((EnemyMage) enemy).removeProjectile(proj);
+                        }
+                        else
+                            proj.checkContact(allyMap);
+                    }
+                }
             }
         }
 
@@ -1114,7 +1338,7 @@ public class MapView extends SurfaceView implements Runnable {
                                 m_Score -= 50;
                             }
                             else if(selectedAlly.equals("Archer")) {
-                                allyMap[y][x] = new Archer(map[y][x].x, map[y][x].y, x, y, bitmapArcher, bitmapMageProjectile, scale);
+                                allyMap[y][x] = new Archer(map[y][x].x, map[y][x].y, x, y, bitmapArcher, bitmapArcherProjectile, scale, m_BlockSize, m_ScreenWidth);
                                 m_Score -= 75;
                             }
                             else if(selectedAlly.equals("Spearman")) {
@@ -1164,7 +1388,15 @@ public class MapView extends SurfaceView implements Runnable {
     }
 
     public void summonEnemy(int lane){ //Base index 0, until 4??
-        Enemy panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapEnemy,scale,m_BlockSize);
+        //Random rand = new Random();
+        Enemy panel;
+        //int result = rand.nextInt(2);
+
+        //Log.e(TAG, result +"");
+        //if(result == 1)
+            panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapEnemy,scale,m_BlockSize);
+        //else
+        //    panel = new EnemyMage(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapEnemy, bitmapEnemyProjectile, scale,m_BlockSize);
         enemies.add(panel);
     }
 
@@ -1179,6 +1411,11 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapCastle.recycle();
         bitmapEnemy.recycle();
         bitmapMageProjectile.recycle();
+        bitmapArcher.recycle();
+        bitmapArcherIcon.recycle();
+        bitmapSpearman.recycle();
+        bitmapSpearmanIcon.recycle();
+        bitmapArcherProjectile.recycle();
         bitmapWizard = null;
         bitmapBackground = null;
         bitmapWizardIcon = null;
@@ -1188,6 +1425,11 @@ public class MapView extends SurfaceView implements Runnable {
         bitmapCastle = null;
         bitmapEnemy = null;
         bitmapMageProjectile = null;
+        bitmapArcher = null;
+        bitmapArcherIcon = null;
+        bitmapSpearman = null;
+        bitmapSpearmanIcon = null;
+        bitmapArcherProjectile = null;
         pause();
     }
 }

@@ -45,6 +45,7 @@ public abstract class Enemy extends Fighter{
     }
 
 
+
     public void encounterAlly(Ally ally){
         this.Rival = ally;
     }

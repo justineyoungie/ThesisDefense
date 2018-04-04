@@ -23,7 +23,7 @@ public class Level extends AppCompatActivity {
         display.getSize(size);
 
         // Create a new View based on the SnakeView class
-        mapView = new MapView(this, size);
+        mapView = new MapView(this, size, "Easy");
 
         // Make snakeView the default view of the Activity
         setContentView(mapView);
