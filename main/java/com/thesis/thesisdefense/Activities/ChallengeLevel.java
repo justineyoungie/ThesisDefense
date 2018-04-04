@@ -75,8 +75,6 @@ public class ChallengeLevel extends SurfaceView implements Runnable {
     // The current m_Score
     private int m_Score;
 
-    private int currentWave = 0;
-    private int maxWave;
 
     /*// The location in the grid of all the segments
     private int[] m_SnakeXs;
@@ -136,9 +134,6 @@ public class ChallengeLevel extends SurfaceView implements Runnable {
 
     private ArrayList<Enemy> enemies;
     private MediaPlayer player;
-    private int[] enemyCount;
-    private ArrayList<Integer>[] enemySpawnTime;
-    private int timePassedPerWave = 0;
     private boolean winner = false;
     private boolean gameOver = false;
     private boolean winCon = false;
@@ -231,11 +226,9 @@ public class ChallengeLevel extends SurfaceView implements Runnable {
             try {
                 if(!fastforward) {
                     Thread.sleep(100);
-                    timePassedPerWave += 100;
                 }
                 else{
                     Thread.sleep(30);
-                    timePassedPerWave += 30;
                 }
                 //if(checkForUpdate()) {
                 updateGame();
@@ -271,14 +264,12 @@ public class ChallengeLevel extends SurfaceView implements Runnable {
     public void startGame() {
         // ini
         // reset everything
-        currentWave = 0;
         allyMap = new Ally[5][8];
         //initializing resources
 
         map = new Point[5][8];
 
         enemies = new ArrayList<>();
-        timePassedPerWave = 0;
         gameOver = false;
         winner = false;
         killedEnemies = new ArrayList<>();
@@ -488,7 +479,6 @@ public class ChallengeLevel extends SurfaceView implements Runnable {
             m_Canvas.drawText("Coins: " + m_Score, (int) 460 * scale, (int)40 * scale, m_Paint);
 
 
-            m_Canvas.drawText("Wave: " + (currentWave + 1) + "/" + maxWave, (int) 380 * scale, (int)40 * scale, m_Paint);
 
             m_Paint.reset();
             //pause button
@@ -791,7 +781,6 @@ public class ChallengeLevel extends SurfaceView implements Runnable {
             // Setup when the next update will be triggered
             m_NextFrameTime =System.currentTimeMillis() + MILLIS_IN_A_SECOND / FPS;
 
-            timePassedPerWave += MILLIS_IN_A_SECOND / FPS;
             // Return true so that the update and draw
             // functions are executed
             return true;
@@ -883,27 +872,8 @@ public class ChallengeLevel extends SurfaceView implements Runnable {
 
         ArrayList<Integer> temp = new ArrayList<>();
 
-        // summon new enemies
-        for(int j = 0; j < enemySpawnTime[currentWave].size(); j++){
-            if(j < enemySpawnTime[currentWave].size()) {
-                if(enemySpawnTime[currentWave] != null) {
-                    int spawn = enemySpawnTime[currentWave].get(j);
-                    if (spawn <= timePassedPerWave) {
-                        Random rand = new Random();
-                        this.summonEnemy(rand.nextInt(5));
-                        temp.add(spawn);
-                        if (currentWave == enemySpawnTime.length - 1) {
-                            winCon = true;
-                        }
-                    }
-                }
-            }
-        }
 
-        //removes enemies from enemySpawnTime[currentWave] to update the enemies being spawned
-        for(int j = 0; j < temp.size(); j++){
-            enemySpawnTime[currentWave].remove(temp.get(j));
-        }
+
 
         ArrayList<Spell> tempor = new ArrayList<>();
         // clear spells
@@ -930,15 +900,7 @@ public class ChallengeLevel extends SurfaceView implements Runnable {
             }
         }
 
-        if(enemySpawnTime[currentWave].size() == 0 && enemies.size() == 0 && currentWave < enemySpawnTime.length - 1) {
-            currentWave++;
-            timePassedPerWave = 0;
-        }
 
-        else if(currentWave == maxWave - 1 && enemies.size() == 0 && winCon && enemySpawnTime[currentWave].size() == 0){
-            winner = true;
-            //m_Playing = false;
-        }
     }
 
 

@@ -23,6 +23,13 @@ public class LevelSelect extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_levelselect);
 
+        Button button = (Button) this.findViewById(R.id.btn_tutorial);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent();
+            }
+        });
 
     }
 
