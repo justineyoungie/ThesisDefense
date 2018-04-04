@@ -20,7 +20,7 @@ public abstract class Enemy extends Fighter{
     protected double speed;
     protected Ally Rival; // The ally the enemy is currently fighting
     protected int score; // coins earned when defeated
-    protected int scoreDisplayLength = 10;
+    protected String status = "";
 
     public Enemy(int posX, int poxY, int maxHealth, int damage, long attackPause,
                 int LaneY, int incrementX, int incrementY, Bitmap image, float scale, int idleFrames,
@@ -44,13 +44,13 @@ public abstract class Enemy extends Fighter{
         return LaneY;
     }
 
-    public boolean checkDisplayScore(){
-        scoreDisplayLength--;
-        return scoreDisplayLength == 0;
-    }
 
 
     public void encounterAlly(Ally ally){
         this.Rival = ally;
+    }
+
+    public void inflictStatus(String status){
+        this.status = status;
     }
 }
