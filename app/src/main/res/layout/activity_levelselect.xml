@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/castle_bg"
+    tools:context="com.thesis.thesisdefense.Activities.Main">
+
+    <Button
+        android:id="@+id/btn_tutorial"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="92dp"
+        android:layout_marginTop="164dp"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Tutorial"
+        app:layout_constraintBottom_toTopOf="@+id/button_lvl6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.727" />
+
+    <Button
+        android:id="@+id/btn_hard"
+        android:layout_width="wrap_content"
+        android:layout_height="37dp"
+        android:layout_marginBottom="84dp"
+        android:layout_marginStart="392dp"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Hard"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btn_easy"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="92dp"
+        android:layout_marginTop="260dp"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Easy"
+        app:layout_constraintBottom_toTopOf="@+id/button_lvl6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.727" />
+
+    <Button
+        android:id="@+id/btn_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="37dp"
+        android:layout_marginBottom="180dp"
+        android:layout_marginStart="392dp"
+        android:background="@drawable/mybutton"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Medium"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="166dp"
+        android:layout_height="41dp"
+        android:fontFamily="serif"
+        android:text="Select a Level:"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:layout_editor_absoluteX="217dp"
+        tools:layout_editor_absoluteY="35dp" />
+
+
+</android.support.constraint.ConstraintLayout>
+
