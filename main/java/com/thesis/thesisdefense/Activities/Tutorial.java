@@ -153,6 +153,7 @@ public class Tutorial extends SurfaceView implements Runnable {
     /////
 
     private boolean fastforward = false;
+    private boolean tutorialdone = false;
 
     public Tutorial(Context context, Point size) {
         super(context);
@@ -896,6 +897,9 @@ public class Tutorial extends SurfaceView implements Runnable {
             case MotionEvent.ACTION_DOWN:
                 startX = motionEvent.getX();
                 startY = motionEvent.getY();
+                if(tutorialdone){
+                    //Switch activity if the tutorial is done
+                }
                 if(winner){
                     //this.destroy();
                     pause();
@@ -1201,7 +1205,10 @@ public class Tutorial extends SurfaceView implements Runnable {
             waitTime = 40;
         }
         else if(scene == 8){
-
+            dialogtexts = new ArrayList<>();
+            dialogtexts.add("Congratulations!");
+            dialogtexts.add("You have passed your mock defense!");
+            tutorialdone = true;
         }
     }
     public void updateScene(){

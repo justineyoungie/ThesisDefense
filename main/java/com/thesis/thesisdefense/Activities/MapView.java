@@ -192,10 +192,13 @@ public class MapView extends SurfaceView implements Runnable {
         while (m_Playing) {
             // Update 10 times a second
             try {
-                if(!fastforward)
+                if(!fastforward) {
                     Thread.sleep(100);
+                    timePassedPerWave += 100;
+                }
                 else{
                     Thread.sleep(30);
+                    timePassedPerWave += 30;
                 }
                 //if(checkForUpdate()) {
                 updateGame();
