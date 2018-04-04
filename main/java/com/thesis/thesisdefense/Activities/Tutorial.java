@@ -1,6 +1,8 @@
 package com.thesis.thesisdefense.Activities;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -96,6 +98,8 @@ public class Tutorial extends SurfaceView implements Runnable {
     private Bitmap bitmapIce;
     private Bitmap bitmapThunder;
 
+    private Bitmap bitmapNarrator;
+
     /*
         For drawing allies to the map
      */
@@ -155,6 +159,8 @@ public class Tutorial extends SurfaceView implements Runnable {
     private boolean fastforward = false;
     private boolean tutorialdone = false;
 
+    private boolean usedSkill = false;
+
     public Tutorial(Context context, Point size) {
         super(context);
         m_context = context;
@@ -192,6 +198,8 @@ public class Tutorial extends SurfaceView implements Runnable {
         bitmapFire = BitmapFactory.decodeResource(this.getResources(), R.drawable.spell_fire);
         bitmapIce = BitmapFactory.decodeResource(this.getResources(), R.drawable.spell_ice);
         bitmapThunder = BitmapFactory.decodeResource(this.getResources(), R.drawable.spell_thunder);
+
+        bitmapNarrator = BitmapFactory.decodeResource(this.getResources(), R.drawable.knight_portrait);
 
 
         loadSound();
@@ -572,10 +580,9 @@ public class Tutorial extends SurfaceView implements Runnable {
                     (int) (m_ScreenWidth - 140 * scale),     (int) (m_ScreenHeight + (spellY + 80) * scale));
             if(scene != 8){
                 m_Paint.setColorFilter(new LightingColorFilter(0xFF7F7F7F, 0x00000000));
-                m_Canvas.drawBitmap(bitmapFire, src, dst, null);
+                m_Canvas.drawBitmap(bitmapFire, src, dst, m_Paint);
             }
             else {
-                m_Paint.setColorFilter(new LightingColorFilter(0xFF7F7F7F, 0x00000000));
                 m_Canvas.drawBitmap(bitmapFire, src, dst, null);
             }
             m_Paint.reset();
@@ -722,8 +729,9 @@ public class Tutorial extends SurfaceView implements Runnable {
             }
 
             if(dialogtexts != null) {
+
                 dialog = new Dialog(m_Canvas.getWidth(), m_Canvas.getHeight(), scale);
-                dialog.drawDialog(m_Canvas, dialogtexts, m_Paint, dialogTextSize);
+                dialog.drawDialog(m_Canvas, dialogtexts, m_Paint, dialogTextSize, bitmapNarrator);
             }
 
             // Draw the whole frame
@@ -898,6 +906,9 @@ public class Tutorial extends SurfaceView implements Runnable {
                 startX = motionEvent.getX();
                 startY = motionEvent.getY();
                 if(tutorialdone){
+                    Intent intent = new Intent(this.getContext(), Main.class);
+                    this.getContext().startActivity(intent);
+                    ((Activity) this.getContext()).finish();
                     //Switch activity if the tutorial is done
                 }
                 if(winner){
@@ -999,6 +1010,7 @@ public class Tutorial extends SurfaceView implements Runnable {
                                     motionEvent.getX() <= map[y][x].x + m_BlockSize &&
                                     motionEvent.getY() >= map[y][x].y &&
                                     motionEvent.getY() <= map[y][x].y + m_NumBlocksHigh){ // if within a block inside map
+                                usedSkill = true;
                                 switch(spellActivated){
                                     case "Fire":
                                         Fire fire = new Fire();
@@ -1060,10 +1072,12 @@ public class Tutorial extends SurfaceView implements Runnable {
                             // insert whoever's selected
                             if(selectedAlly.equals("Wizard")) {
                                 allyMap[y][x] = new Wizard(map[y][x].x, map[y][x].y, x, y, bitmapWizard, bitmapMageProjectile, scale,m_BlockSize,m_ScreenWidth);
+                                allyMap[y][x].setGodMode();
                                 m_Score -= 100;
                             }
                             else if(selectedAlly.equals("Warrior")) {
                                 allyMap[y][x] = new Warrior(map[y][x].x, map[y][x].y, x, y, bitmapWarrior, scale);
+                                allyMap[y][x].setGodMode();
                                 m_Score -= 50;
                             }
                         }
@@ -1153,13 +1167,13 @@ public class Tutorial extends SurfaceView implements Runnable {
             dialogtexts.add("Hello there! I see you are here to defend your thesis");
             dialogtexts.add("First off to defend your thesis, You have to form a good team");
             dialogtexts.add("Drag an drop units from the upper left screen to the field to prepare to defend your thesis");
-            dialogTextSize = 30;
+            dialogTextSize = 35;
 
         }
         else if(scene == 2){
             dialogtexts = new ArrayList<>();
             dialogtexts.add("Here comes the panelists!");
-            waitTime = 20;
+            waitTime = 35;
         }
         else if(scene == 3){
             dialogtexts = new ArrayList<>();
@@ -1172,14 +1186,14 @@ public class Tutorial extends SurfaceView implements Runnable {
                     }
                 }
             }
-            waitTime = 20;
+            waitTime = 40;
         }
         else if(scene == 4){
             dialogtexts = new ArrayList<>();
             dialogtexts.add("Congratulations!");
             dialogtexts.add("Your team has defended your thesis from a panel!");
             m_Score = 100;
-            waitTime = 20;
+            waitTime = 40;
         }
         else if(scene == 5){
             dialogtexts = new ArrayList<>();
@@ -1193,7 +1207,7 @@ public class Tutorial extends SurfaceView implements Runnable {
         }
         else if(scene == 7){
             dialogtexts = new ArrayList<>();
-            dialogtexts.add("One of your team is about to face the panel");
+            dialogtexts.add("The team is about to face the panel");
             dialogtexts.add("Get ready!");
             for(int i = 0 ; i < allyMap.length; i++){
                 for(int j = 0; j < allyMap[i].length; j++){
@@ -1206,8 +1220,16 @@ public class Tutorial extends SurfaceView implements Runnable {
         }
         else if(scene == 8){
             dialogtexts = new ArrayList<>();
+            dialogtexts.add("Okay, now lets try throwing them flowery words");
+            dialogtexts.add("to hurt them with our confidence");
+            dialogtexts.add("Pick a skill from below and ");
+            usedSkill = false;
+        }
+        else if(scene == 9){
+            dialogtexts = new ArrayList<>();
             dialogtexts.add("Congratulations!");
-            dialogtexts.add("You have passed your mock defense!");
+            dialogtexts.add("You have passed your thesis defense!");
+            dialogtexts.add("Tap again to move on");
             tutorialdone = true;
         }
     }
@@ -1281,6 +1303,20 @@ public class Tutorial extends SurfaceView implements Runnable {
                 canSwitchScene = true;
             }
 
+        }
+        else if(scene == 8){
+            if(enemies.size() <= 0 && !usedSkill){
+                for(int i = 0 ; i < allyMap.length; i++){
+                    for(int j = 0; j < allyMap[i].length; j++){
+                        if(allyMap[i][j] != null){
+                            summonEnemy(i);
+                        }
+                    }
+                }
+            }
+            else if(enemies.size() == 0 && usedSkill){
+                canSwitchScene = true;
+            }
         }
 
     }

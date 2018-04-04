@@ -221,4 +221,9 @@ public abstract class Fighter extends Drawable {
     public int getIdleFrameEnd() {return idleFrameEnd; };
 
     public int getAttackFrameEnd() {return  attackFrameEnd; };
+
+    public void setGodMode(){
+        this.maxHealth = Integer.MAX_VALUE;
+        this.currentHealth = Integer.MAX_VALUE;
+    }
 }
