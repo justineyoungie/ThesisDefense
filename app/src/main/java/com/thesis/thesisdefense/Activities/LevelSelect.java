@@ -31,7 +31,8 @@ public class LevelSelect extends AppCompatActivity{
         easyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(LevelSelect.this, MapView.class);
+                Intent i = new Intent(LevelSelect.this, Level.class);
+                i.putExtra("TAG" , "Easy");
                 startActivity(i);
             }
         });
@@ -40,7 +41,8 @@ public class LevelSelect extends AppCompatActivity{
         mediumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(LevelSelect.this, MapView.class);
+                Intent i = new Intent(LevelSelect.this, Level.class);
+                i.putExtra("TAG","Moderate");
                 startActivity(i);
             }
         });
@@ -49,7 +51,8 @@ public class LevelSelect extends AppCompatActivity{
         hardBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(LevelSelect.this, MapView.class);
+                Intent i = new Intent(LevelSelect.this, Level.class);
+                i.putExtra("TAG","Difficult");
                 startActivity(i);
             }
         });

@@ -11,6 +11,7 @@ import com.thesis.thesisdefense.DatabaseHelpers.GameDBhelper;
 public class Level extends AppCompatActivity {
 
     public MapView mapView;
+    public static final String TAG = "Thesis Defense";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,9 +28,10 @@ public class Level extends AppCompatActivity {
 
         //Create the Database, it will create a new DB if it doesnt exist yet, if not the db will use existing db of app
         GameDBhelper dbhelper = new GameDBhelper(this);
+        String difficulty = getIntent().getStringExtra("TAG");
 
         // Create a new View based on the SnakeView class
-        mapView = new MapView(this, size, "Easy",dbhelper);
+        mapView = new MapView(this, size, difficulty,dbhelper);
 
         // Make snakeView the default view of the Activity
         setContentView(mapView);
