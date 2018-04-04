@@ -15,7 +15,7 @@ public class Credits extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_credits);
 
-        Button button = this.findViewById(R.id.button_back);
+        Button button = (Button) this.findViewById(R.id.button_back);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
