@@ -25,8 +25,8 @@ public class Main extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        logo = this.findViewById(R.id.image_logo);
-        touch = this.findViewById(R.id.text_touch);
+        logo = (ImageView) this.findViewById(R.id.image_logo);
+        touch = (TextView) this.findViewById(R.id.text_touch);
 
         setupAnimationLogo();
     }

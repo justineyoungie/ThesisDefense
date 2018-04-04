@@ -1,6 +1,10 @@
 package com.thesis.thesisdefense.Models;
 
 import android.graphics.Bitmap;
+import android.util.Log;
+
+//import static com.thesis.thesisdefense.Activities.MapView.TAG;
+//import static com.thesis.thesisdefense.Activities.MapView.m_BlockSize;
 
 /**
  * Created by justine on 3/10/18.
@@ -11,33 +15,36 @@ public class Panelist extends Enemy{
     public static int FRAME_WIDTH;
     public static int FRAME_HEIGHT;
 
-    public Panelist(int posX, int poxY, int indexY, Bitmap image, float scale) {
-        super(posX, poxY, 7, 1, 1000, indexY, image, scale, 4, 10, 5, 1, 25);
+    private int m_blocksize;
+    public Panelist(int posX, int poxY, int indexY, Bitmap image, float scale, int m_blocksize) {
+        super(posX, poxY, 7, 1, 750, indexY, 471, 494, image, scale, 7, 7, 5, 1, 25);
         FRAME_WIDTH = this.incrementX;
-        FRAME_HEIGHT = this.getImageHeight();
+        FRAME_HEIGHT = this.incrementY;
+        this.m_blocksize = m_blocksize;
 
     }
 
     @Override
-    public void updateEnemy(Ally[][] allyMap, int m_BlockSize){
+    public void updateEnemy(Ally[][] allyMap){
 
+        this.nextFrame();
         //checks every ally in the Lane
 
         if(this.Rival == null) {
             for(int i = 0; i < allyMap[this.LaneY].length; i++){
                 Ally ally = allyMap[this.LaneY][i];
                 if(ally != null){
-                    if( this.posX <= ally.posX+m_BlockSize*range-30 && this.posX  + (m_BlockSize + 60) / 2 > ally.posX + 30 &&
+                    if( this.posX <= ally.posX+m_blocksize*range-30 && this.posX + (m_blocksize + 90) / 2 > ally.posX + 30 &&
                         this.Rival == null){ //add ally to enemys encounter if ally is in range
 
-                        this.Rival = ally;
+                        encounterAlly(ally);
                     }
                 }
             }
             this.posX -= this.speed;
         }
         else{
-            if(Rival.currentHealth == 0){
+            if(Rival.isDead()){
                 Rival = null;
             }
             else {
@@ -54,6 +61,5 @@ public class Panelist extends Enemy{
                 }
             }
         }
-        this.nextFrame();
     }
 }
