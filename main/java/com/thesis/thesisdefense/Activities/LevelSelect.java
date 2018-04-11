@@ -61,7 +61,7 @@ public class LevelSelect extends AppCompatActivity{
         tutorialBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(LevelSelect.this, Tutorial.class);
+                Intent i = new Intent(LevelSelect.this, TutorialActivity.class);
                 startActivity(i);
             }
         });

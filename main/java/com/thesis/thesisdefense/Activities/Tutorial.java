@@ -906,7 +906,7 @@ public class Tutorial extends SurfaceView implements Runnable {
                 startX = motionEvent.getX();
                 startY = motionEvent.getY();
                 if(tutorialdone){
-                    Intent intent = new Intent(this.getContext(), Main.class);
+                    Intent intent = new Intent(this.getContext(), Menu.class);
                     this.getContext().startActivity(intent);
                     ((Activity) this.getContext()).finish();
                     //Switch activity if the tutorial is done
