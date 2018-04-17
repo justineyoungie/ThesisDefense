@@ -1,7 +1,6 @@
 package com.thesis.thesisdefense.Models;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 //import static com.thesis.thesisdefense.Activities.MapView.TAG;
 //import static com.thesis.thesisdefense.Activities.MapView.m_BlockSize;

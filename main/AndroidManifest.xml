@@ -9,7 +9,8 @@
         android:roundIcon="@drawable/launcher_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:largeHeap="true">
+        android:largeHeap="true"
+        >
         <activity
             android:name=".Activities.Level"
             android:configChanges="orientation|keyboardHidden|screenSize"

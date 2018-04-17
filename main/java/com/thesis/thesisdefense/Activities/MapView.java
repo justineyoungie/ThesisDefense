@@ -15,7 +15,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -1506,7 +1505,6 @@ public class MapView extends SurfaceView implements Runnable {
         Enemy panel;
         //int result = rand.nextInt(2);
 
-        //Log.e(TAG, result +"");
         //if(result == 1)
             panel = new Panelist(map[lane][7].x+m_BlockSize*2, map[lane][7].y,lane,bitmapEnemy,scale,m_BlockSize);
         //else
