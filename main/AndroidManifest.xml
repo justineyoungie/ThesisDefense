@@ -4,12 +4,13 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/thesis"
+        android:icon="@drawable/launcher_icon"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/thesis"
+        android:roundIcon="@drawable/launcher_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:largeHeap="true">
+        android:largeHeap="true"
+        >
         <activity
             android:name=".Activities.Level"
             android:configChanges="orientation|keyboardHidden|screenSize"

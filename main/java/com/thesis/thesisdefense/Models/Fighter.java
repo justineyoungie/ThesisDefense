@@ -6,7 +6,6 @@ package com.thesis.thesisdefense.Models;
 
 import android.graphics.Bitmap;
 import android.graphics.Point;
-import android.util.Log;
 
 import com.thesis.thesisdefense.Activities.MapView;
 

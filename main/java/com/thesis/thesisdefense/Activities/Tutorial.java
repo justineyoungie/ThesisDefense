@@ -15,7 +15,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -440,7 +439,7 @@ public class Tutorial extends SurfaceView implements Runnable {
 
             // draw castle on the side
             src = new Rect(0, 0, bitmapCastle.getWidth(), bitmapCastle.getHeight());
-            dst = new Rect((int)(-120 * scale), (int)(-80 * scale), (int) (120 * scale), m_ScreenHeight);
+            dst = new Rect((int)(-120 * scale), (int)(-80 * scale), (int) (60 * scale), m_ScreenHeight);
             m_Canvas.drawBitmap(bitmapCastle, src, dst, m_Paint);
 
 

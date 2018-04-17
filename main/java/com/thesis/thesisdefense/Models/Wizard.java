@@ -21,9 +21,9 @@ public class Wizard extends Ally{
     private int m_blocksize;
     private int m_ScreenWidth;
     public Wizard(int posX, int poxY, int indexX, int indexY, Bitmap image, Bitmap projImage, float scale, int m_blocksize, int m_ScreenWidth) {
-        super(posX, poxY, 5, 3, 1000, indexX, indexY,
-                477, 484, image, scale,
-                7, 7, 7);
+        super(posX, poxY, 5, 3, 1500, indexX, indexY,
+                image.getWidth() / 7, image.getHeight() / 2, image, scale,
+                8, 8, 7);
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.incrementY;
         this.projImage = projImage;

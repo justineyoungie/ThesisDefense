@@ -1,7 +1,6 @@
 package com.thesis.thesisdefense.Models;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 //import static com.thesis.thesisdefense.Activities.MapView.TAG;
 //import static com.thesis.thesisdefense.Activities.MapView.m_BlockSize;
@@ -17,7 +16,8 @@ public class Panelist extends Enemy{
 
     private int m_blocksize;
     public Panelist(int posX, int poxY, int indexY, Bitmap image, float scale, int m_blocksize) {
-        super(posX, poxY, 7, 1, 750, indexY, 471, 494, image, scale, 7, 7, 5, 1, 25);
+        super(posX, poxY, 7, 1, 750, indexY,
+                image.getWidth() / 7, image.getHeight() / 2, image, scale, 7, 7, 5, 1, 25);
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.incrementY;
         this.m_blocksize = m_blocksize;

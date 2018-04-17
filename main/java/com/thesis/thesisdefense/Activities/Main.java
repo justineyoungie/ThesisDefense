@@ -55,7 +55,7 @@ public class Main extends AppCompatActivity{
     public boolean onTouchEvent(MotionEvent motionEvent) {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                Intent intent = new Intent(Main.this, Menu.class);
+                Intent intent = new Intent(Main.this, LevelSelect.class);
                 this.startActivity(intent);
                 break;
         }
