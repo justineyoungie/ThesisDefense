@@ -16,7 +16,8 @@ public class Spearman extends Ally{
     public static int FRAME_HEIGHT;
 
     public Spearman(int posX, int poxY, int indexX, int indexY, Bitmap image, float scale) {
-        super(posX, poxY, 10, 2, 500, indexX, indexY, 615, 475, image, scale, 6, 8, 2);
+        super(posX, poxY, 10, 3, 500, indexX, indexY,
+                image.getWidth() / 9, image.getHeight() / 2, image, scale, 5, 7, 2);
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.incrementY;
     }

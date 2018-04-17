@@ -244,7 +244,8 @@ public class MapView extends SurfaceView implements Runnable {
                 }
                 //if(checkForUpdate()) {
                 updateGame();
-                drawGame();
+                if(m_Playing)
+                    drawGame();
                 //}
             }
             catch (Exception e){
@@ -259,10 +260,13 @@ public class MapView extends SurfaceView implements Runnable {
             m_Thread.join();
         } catch (InterruptedException e) {
             // Error
+        } catch (NullPointerException ex){
+            // Error
         }
 
         player.pause();
-        drawGame();
+        if(!winner)
+            drawGame();
     }
 
     public void resume() {
@@ -298,9 +302,9 @@ public class MapView extends SurfaceView implements Runnable {
 
         // temporary instantiation
         new Wizard(0, 0, 0, 0, bitmapWizard, bitmapMageProjectile, scale,m_BlockSize,m_ScreenWidth);
-        new Warrior(0, 0, 0, 0, bitmapWarrior, 0);
-        new Archer(0, 0, 0, 0, bitmapArcher, bitmapMageProjectile, 0,m_BlockSize,m_ScreenWidth);
-        new Spearman(0, 0, 0, 0, bitmapSpearman, 0);
+        new Warrior(0, 0, 0, 0, bitmapWarrior, scale);
+        new Archer(0, 0, 0, 0, bitmapArcher, bitmapMageProjectile, scale,m_BlockSize,m_ScreenWidth);
+        new Spearman(0, 0, 0, 0, bitmapSpearman, scale);
 /*
         //read
         Cursor cursor = dBhelper.getAllData();
@@ -629,7 +633,7 @@ public class MapView extends SurfaceView implements Runnable {
             m_Canvas = m_Holder.lockCanvas();
 
             // Clear the screen with my favorite color
-            //m_Canvas.drawColor(Color.argb(255, 51, 181, 229));
+            // m_Canvas.drawColor(Color.argb(255, 51, 181, 229));
 
             m_Paint.reset();
             // draw background
@@ -654,7 +658,6 @@ public class MapView extends SurfaceView implements Runnable {
 
             m_Paint.setColor(Color.rgb(0,0,0));
 
-
             Rect src;
             Rect dst;
 
@@ -669,7 +672,7 @@ public class MapView extends SurfaceView implements Runnable {
 
             // draw castle on the side
             src = new Rect(0, 0, bitmapCastle.getWidth(), bitmapCastle.getHeight());
-            dst = new Rect((int)(-120 * scale), (int)(-80 * scale), (int) (120 * scale), m_ScreenHeight);
+            dst = new Rect((int)(-120 * scale), (int)(-80 * scale), (int) (60 * scale), m_ScreenHeight);
             m_Canvas.drawBitmap(bitmapCastle, src, dst, m_Paint);
 
 
@@ -1241,9 +1244,9 @@ public class MapView extends SurfaceView implements Runnable {
                 startX = motionEvent.getX();
                 startY = motionEvent.getY();
                 if(winner){
-                    //this.destroy();
                     pause();
-                    startGame();
+                    this.destroy();
+                    this.getContext().startActivity(new Intent(this.getContext(), LevelSelect.class));
                 }
                 else if(gameOver){
                    if( motionEvent.getX() >= m_ScreenWidth / 4 &&
@@ -1294,7 +1297,7 @@ public class MapView extends SurfaceView implements Runnable {
                         motionEvent.getX() <= Math.round(280 * scale) &&
                         motionEvent.getY() >= Math.round(10 * scale) &&
                         motionEvent.getY() <= Math.round(50 * scale) &&
-                        m_Score >= 50){ // pressed the archer icon
+                        m_Score >= 75){ // pressed the archer icon
                     isSelecting = true;
                     cursorLocation.x = (int) motionEvent.getX();
                     cursorLocation.y = (int) motionEvent.getY();
@@ -1305,7 +1308,7 @@ public class MapView extends SurfaceView implements Runnable {
                         motionEvent.getX() <= Math.round(370 * scale) &&
                         motionEvent.getY() >= Math.round(10 * scale) &&
                         motionEvent.getY() <= Math.round(50 * scale) &&
-                        m_Score >= 50){ // pressed the spearman icon
+                        m_Score >= 125){ // pressed the spearman icon
                     isSelecting = true;
                     cursorLocation.x = (int) motionEvent.getX();
                     cursorLocation.y = (int) motionEvent.getY();

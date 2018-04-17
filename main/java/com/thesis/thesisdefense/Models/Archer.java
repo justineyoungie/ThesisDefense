@@ -24,8 +24,8 @@ public class Archer extends Ally {
 
     public Archer(int posX, int poxY, int indexX, int indexY, Bitmap image, Bitmap projImage, float scale, int m_blocksize, int m_ScreenWidth) {
         super(posX, poxY, 5, 1, 500, indexX, indexY,
-                485, 493, image, scale,
-                8, 7, 7);
+                image.getWidth() / 7, image.getHeight() / 2, image, scale,
+                7, 6, 7);
         FRAME_WIDTH = this.incrementX;
         FRAME_HEIGHT = this.incrementY;
         this.projImage = projImage;
